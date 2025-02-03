@@ -130,3 +130,61 @@ class TestReturnedType:
         board[2][2] = "T_X"
         board[3][3] = "T_O"
         assert isinstance(oxo.is_winner(board, "Bobby", (1,1)), bool)
+
+
+class TestJunkClass:
+    #@TODO class theses functions
+    def test_findTotem(self):
+        board = oxo.init_board()
+        # Test an exception is raised
+        try:
+            oxo.find_totem(board, "WRONG_TOTEM")
+            assert False
+        except ValueError:
+            assert True
+        try:
+            t_x = oxo.find_totem(board, 'T_X')
+            assert board[t_x[0]][t_x[1]] == 'T_X'
+            t_o = oxo.find_totem(board, 'T_O')
+            assert board[t_o[0]][t_o[1]] == 'T_O'
+        except:
+            assert False
+
+class TestTotemMoves:
+    '''Test the possible moves of the totem'''
+
+    def test_initPosition(self):
+        ''' Test that totems are correctly placed'''
+        board = oxo.init_board()
+        t_x = oxo.find_totem(board, "T_X")
+        t_o = oxo.find_totem(board, "T_O")
+        assert (t_x[0] == 2 or t_x[0] == 3) and (t_x[1] == 2 or t_x[1] == 3)
+        assert (t_o[0] == 2 or t_o[0] == 3) and (t_o[1] == 2 or t_o[1] == 3)
+        assert t_x != t_o
+
+    def test_firstMoveAfterInit(self):
+        ''' Test that the whole row and line is allowed for a totem after the board init '''
+        board = oxo.init_board()
+        print(oxo.str_board(board))
+        print(oxo.all_totem_moves(board, 'T_X'))
+        assert len(oxo.all_totem_moves(board, 'T_X')) == 10
+
+    def test_noMovePossible(self):
+        ''' Test a totem can't move if the board is full'''
+        board = [['NO!' for _ in range(6)] for _ in range(6)]
+        board[2][3] = 'T_X'
+        assert oxo.all_totem_moves(board, 'T_X') == set()
+
+    def test_totem_near_pawn_jump_right(self):
+        board = [
+            ['T_X', '   ', '   ', 'P_X', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        expected_moves = {(0, 2), (0, 3), (0, 4), (0, 5),  # horizontal moves
+                          (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)}  # vertical moves
+        moves = oxo.all_totem_moves(board, 'T_X')
+        assert moves == expected_moves

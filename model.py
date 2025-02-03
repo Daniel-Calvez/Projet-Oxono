@@ -104,7 +104,7 @@ def all_free_cells(board: list[list[str]]) -> set[tuple[int,int]]:
     Raise
         No exception
     '''
-    cells = [board[row][col] for row in board for col in board[row] if board[row][col] == EMPTY_CELL]
+    cells = [board[row][col] for row in range(len(board)) for col in range(len(board[row])) if board[row][col] == EMPTY_CELL]
     return set(cells)
 
 def row_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: str) -> set[tuple[int,int]]:
@@ -214,10 +214,10 @@ def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
         return all_free_cells(board)
     
     # Add all moves in each direction, including cell's jump
-    all_moves.add(row_totem_moves(board, (totem_x, totem_y), 'right'))
-    all_moves.add(row_totem_moves(board, (totem_x, totem_y), 'left'))
-    all_moves.add(col_totem_moves(board, (totem_x, totem_y), 'up'))
-    all_moves.add(col_totem_moves(board, (totem_x, totem_y), 'down'))
+    all_moves.union(row_totem_moves(board, (totem_x, totem_y), 'right'))
+    all_moves.union(row_totem_moves(board, (totem_x, totem_y), 'left'))
+    all_moves.union(col_totem_moves(board, (totem_x, totem_y), 'up'))
+    all_moves.union(col_totem_moves(board, (totem_x, totem_y), 'down'))
 
     print(f"There are {len(all_moves)} moves possibles.")
     return all_moves
