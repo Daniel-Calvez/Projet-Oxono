@@ -1,6 +1,8 @@
 import random as rd
+from icecream import ic
 
 EMPTY_CELL = '   '
+ic.configureOutput(includeContext=True)
 
 class TotemException(Exception):
     '''
@@ -130,25 +132,26 @@ def row_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
     if direction == 'right':
         row_range = range(y+1, right_border)
     elif direction == 'left':
-        row_range = range(y-1, 0, -1)
+        row_range = range(y-1, -1, -1)
     else:
         raise ValueError("Direction must be 'right' or 'left'.")
 
-    for col in row_range:
+    for row in row_range:
         # Add moves until meet an obstacle
-        if board[x][col] != EMPTY_CELL:
+        if board[x][row] != EMPTY_CELL:
             break
         else:
-            moves.add((x, col))
+            moves.add((x, row))
 
     # If no move is possible, maybe jumping is possible
     if len(moves) == 0:
         # Find next empty cell
         # @TODO: combine with the previous loop ?
-        for col in row_range:
-            if board[x][col] == EMPTY_CELL:
-                moves.add((x, col))
+        for row in row_range:
+            if board[x][row] == EMPTY_CELL:
+                moves.add((x, row))
                 break
+    print(f"Found {len(moves)} for direction {direction}")
     return moves
 
 def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: str) -> set[tuple[int,int]]:
@@ -171,7 +174,7 @@ def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
 
     # List of cells between the totem and the border
     if direction == 'up':
-        col_range = range(x-1, 0, -1)
+        col_range = range(x-1, -1, -1)
     elif direction == 'down':
         col_range = range(x+1, down_border)
     else:
@@ -179,19 +182,20 @@ def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
 
     for col in col_range:
         # Add moves until meet an obstacle
-        if board[x][col] != EMPTY_CELL:
+        if board[col][y] != EMPTY_CELL:
             break
         else:
-            moves.add((x, col))
+            moves.add((col, y))
 
     # If no move is possible, maybe jumping is possible
     if len(moves) == 0:
         # Find next empty cell
         # @TODO: combine with the previous loop ?
         for col in col_range:
-            if board[x][col] == EMPTY_CELL:
-                moves.add((x, col))
+            if board[col][y] == EMPTY_CELL:
+                moves.add((col, y))
                 break
+    print(f"Found {len(moves)} for direction {direction}")
     return moves
 
 def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
@@ -215,10 +219,10 @@ def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
         return all_free_cells(board)
     
     # Add all moves in each direction, including cell's jump
-    all_moves.union(row_totem_moves(board, (totem_x, totem_y), 'right'))
-    all_moves.union(row_totem_moves(board, (totem_x, totem_y), 'left'))
-    all_moves.union(col_totem_moves(board, (totem_x, totem_y), 'up'))
-    all_moves.union(col_totem_moves(board, (totem_x, totem_y), 'down'))
+    all_moves.update(row_totem_moves(board, (totem_x, totem_y), 'right'))
+    all_moves.update(row_totem_moves(board, (totem_x, totem_y), 'left'))
+    all_moves.update(col_totem_moves(board, (totem_x, totem_y), 'up'))
+    all_moves.update(col_totem_moves(board, (totem_x, totem_y), 'down'))
 
     print(f"There are {len(all_moves)} moves possibles.")
     return all_moves
