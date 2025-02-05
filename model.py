@@ -267,3 +267,13 @@ def convert_coord(coord: str) -> tuple[int,int]:
         raise ValueError(f"{cord} n'est pas correcte")
     
     return (valid_letters.index(coord[0]), int(coord[1])-1)
+
+def is_action(action: str) -> bool:
+    """
+    Checks is the action format is correct
+    Args
+        The action as a string
+    Returns
+        The correctness of the action as a boolean
+    """
+    return (5==len(action)) and action[0].isalpha() and action[1].isalpha() and action[3].isalpha() and action[2].isnumeric and action[4].isnumeric
