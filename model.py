@@ -36,8 +36,11 @@ def str_board(board: list[list[str]]) -> str:
     Raise
         No exception
     '''
-
-    return '\n'.join(['\t'.join([str(f"'{cell}'") for cell in row]) for row in board])
+    displayed_board = "    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮\n"
+    for i in range(len(board)):
+        displayed_board += f"{i} "+'|'.join([str(f"{cell}") for cell in board[i]]) + "\n"
+        if(i<len(board)-1): displayed_board +=  "├───┼───┼───┼───┼───┼───┤\n"
+    return displayed_board
 
 def find_totem(board: list[list[str]], totem: str) -> tuple[int,int]:
     '''
@@ -263,7 +266,7 @@ def convert_coord(coord: str) -> tuple[int,int]:
     """
     valid_letters = ["A","B","C","D","E","F"]
     # Checks if coordinates format is valid
-    if(1>len(coord)>3 and (coord[0] not in valid_letters) and (not coord[1].isnumeric) and (1>int(coord[1])>6)):
+    if(1>len(coord)>3 and (coord[0] not in valid_letters) and (not coord[1].isnumeric()) and (1>int(coord[1])>6)):
         raise ValueError(f"{cord} n'est pas correcte")
     
     return (valid_letters.index(coord[0]), int(coord[1])-1)
@@ -276,4 +279,4 @@ def is_action(action: str) -> bool:
     Returns
         The correctness of the action as a boolean
     """
-    return (5==len(action)) and action[0].isalpha() and action[1].isalpha() and action[3].isalpha() and action[2].isnumeric and action[4].isnumeric
+    return (5==len(action)) and action[0].isalpha() and action[1].isalpha() and action[3].isalpha() and action[2].isnumeric() and action[4].isnumeric()
