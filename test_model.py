@@ -166,8 +166,9 @@ class TestTotemMoves:
         ''' Test that the whole row and line is allowed for a totem after the board init '''
         board = oxo.init_board()
         print(oxo.str_board(board))
-        print(oxo.all_totem_moves(board, 'T_X'))
-        assert len(oxo.all_totem_moves(board, 'T_X')) == 10
+        moves = oxo.all_totem_moves(board, 'T_X')
+        print(moves)
+        assert len(moves) == 10
 
     def test_noMovePossible(self):
         ''' Test a totem can't move if the board is full'''

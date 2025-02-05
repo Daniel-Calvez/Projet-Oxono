@@ -148,6 +148,7 @@ def row_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
             if board[x][col] == EMPTY_CELL:
                 moves.add((x, col))
                 break
+    print(f"Found {len(moves)} for direction {direction}")
     return moves
 
 def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: str) -> set[tuple[int,int]]:
@@ -191,6 +192,8 @@ def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
             if board[x][col] == EMPTY_CELL:
                 moves.add((x, col))
                 break
+    print(f"Found {len(moves)} for direction {direction}")
+    
     return moves
 
 def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
@@ -214,10 +217,10 @@ def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
         return all_free_cells(board)
     
     # Add all moves in each direction, including cell's jump
-    all_moves.union(row_totem_moves(board, (totem_x, totem_y), 'right'))
-    all_moves.union(row_totem_moves(board, (totem_x, totem_y), 'left'))
-    all_moves.union(col_totem_moves(board, (totem_x, totem_y), 'up'))
-    all_moves.union(col_totem_moves(board, (totem_x, totem_y), 'down'))
+    all_moves.update(row_totem_moves(board, (totem_x, totem_y), 'right'))
+    all_moves.update(row_totem_moves(board, (totem_x, totem_y), 'left'))
+    all_moves.update(col_totem_moves(board, (totem_x, totem_y), 'up'))
+    all_moves.update(col_totem_moves(board, (totem_x, totem_y), 'down'))
 
     print(f"There are {len(all_moves)} moves possibles.")
     return all_moves
