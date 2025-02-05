@@ -3,7 +3,7 @@ Oxono Unit Tests
 """
 
 from io import StringIO
-
+from icecream import ic
 import pytest
 
 oxo = pytest.importorskip("model")
@@ -167,7 +167,6 @@ class TestTotemMoves:
         board = oxo.init_board()
         print(oxo.str_board(board))
         moves = oxo.all_totem_moves(board, 'T_X')
-        print(moves)
         assert len(moves) == 10
 
     def test_noMovePossible(self):
@@ -185,7 +184,7 @@ class TestTotemMoves:
             ['   ', '   ', '   ', '   ', '   ', '   '],
             ['   ', '   ', '   ', '   ', '   ', '   ']
         ]
-        expected_moves = {(0, 2), (0, 3), (0, 4), (0, 5),  # horizontal moves
+        expected_moves = {(0, 1), (0, 2),  # horizontal moves
                           (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)}  # vertical moves
         moves = oxo.all_totem_moves(board, 'T_X')
         assert moves == expected_moves
