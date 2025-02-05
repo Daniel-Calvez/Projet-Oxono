@@ -36,7 +36,7 @@ def str_board(board: list[list[str]]) -> str:
     Raise
         No exception
     '''
-    
+
     return '\n'.join(['\t'.join([str(f"'{cell}'") for cell in row]) for row in board])
 
 def find_totem(board: list[list[str]], totem: str) -> tuple[int,int]:
@@ -239,3 +239,16 @@ def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[
     if(totem_coord[1]-1>=0 and board[totem_coord[0], totem_coord[1]-1] != EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]-1))
     if(totem_coord[1]+1<len(board[0]) and board[totem_coord[0], totem_coord[1]+1] != EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]+1))
     return accessible_positions
+
+def valid_player_names(player1: str, player2:str) -> bool:
+    """
+    Check if player names are valid, starting with a capital letter
+    Starting with a different character and doesn't start with the letter T
+    Args
+        The first player name as a string
+        The second player name as a string
+    Returns
+        The validity of the player names as a boolean
+    """
+
+    return len(player1)>0 and len(player2)>0 and (player1[0]!=player2[0]) and (player1[0]!="T") and (player2[0]!="T") and (player1[0].isupper()) and (player2[0].isupper())
