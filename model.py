@@ -252,3 +252,18 @@ def valid_player_names(player1: str, player2:str) -> bool:
     """
 
     return len(player1)>0 and len(player2)>0 and (player1[0]!=player2[0]) and (player1[0]!="T") and (player2[0]!="T") and (player1[0].isupper()) and (player2[0].isupper())
+
+def convert_coord(coord: str) -> tuple[int,int]:
+    """
+    Convert the coordinates given by the player as a position in the board
+    Args
+        The coordinates as a string
+    Returns
+        The coordinates as a tuple
+    """
+    valid_letters = ["A","B","C","D","E","F"]
+    # Checks if coordinates format is valid
+    if(1>len(coord)>3 and (coord[0] not in valid_letters) and (not coord[1].isnumeric) and (1>int(coord[1])>6)):
+        raise ValueError(f"{cord} n'est pas correcte")
+    
+    return (valid_letters.index(coord[0]), int(coord[1])-1)
