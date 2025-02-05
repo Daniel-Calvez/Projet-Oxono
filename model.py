@@ -36,6 +36,7 @@ def str_board(board: list[list[str]]) -> str:
     Raise
         No exception
     '''
+    
     return '\n'.join(['\t'.join([str(f"'{cell}'") for cell in row]) for row in board])
 
 def find_totem(board: list[list[str]], totem: str) -> tuple[int,int]:
@@ -221,3 +222,20 @@ def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
 
     print(f"There are {len(all_moves)} moves possibles.")
     return all_moves
+
+def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[tuple[int,int]]:
+    """
+    Compute every move the player can do after moving the totem
+    Args
+        The board as a matrix
+        The coordinates of the totem as a tuple
+    Returns
+        A list of possible moves as a set of tuple
+    """
+
+    accessible_positions=[]
+    if(totem_coord[0]-1>=0 and board[totem_coord[0]-1, totem_coord[1]] != EMPTY_CELL): accessible_positions.append((totem_coord[0]-1, totem_coord[1]))
+    if(totem_coord[0]+1<len(board) and board[totem_coord[0]+1, totem_coord[1]] != EMPTY_CELL): accessible_positions.append((totem_coord[0]+1, totem_coord[1]))
+    if(totem_coord[1]-1>=0 and board[totem_coord[0], totem_coord[1]-1] != EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]-1))
+    if(totem_coord[1]+1<len(board[0]) and board[totem_coord[0], totem_coord[1]+1] != EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]+1))
+    return accessible_positions
