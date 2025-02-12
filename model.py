@@ -62,6 +62,13 @@ def find_totem(board: list[list[str]], totem: str) -> tuple[int,int]:
                 return (i,j)
     raise ValueError("Totem is not in the board.")
 
+def nb_token(board: list[list[str]], token: str) -> int:
+    total_count = 8
+    for line in board:
+        for elem in line:
+            if elem == token: total_count -= 1 
+    return total_count
+
 
 def is_landlocked(board: list[list[str]], coord: tuple[int,int]) -> bool:
     '''
