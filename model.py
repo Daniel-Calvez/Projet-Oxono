@@ -38,8 +38,13 @@ def str_board(board: list[list[str]]) -> str:
     Raise
         No exception
     '''
-
-    return '\n'.join(['\t'.join([str(f"'{cell}'") for cell in row]) for row in board])
+    displayed_board = "\n    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮\n"
+    for i in range(len(board)):
+        displayed_board += f"{i} "+''.join([str(f"|{cell}") for cell in board[i]])+"|\n"
+        if(i <5):
+            displayed_board += "  ├───┼───┼───┼───┼───┼───┤\n"
+    displayed_board += "  ╰───┴───┴───┴───┴───┴───╯"
+    return displayed_board
 
 def find_totem(board: list[list[str]], totem: str) -> tuple[int,int]:
     '''
@@ -63,6 +68,16 @@ def find_totem(board: list[list[str]], totem: str) -> tuple[int,int]:
     raise ValueError("Totem is not in the board.")
 
 def nb_token(board: list[list[str]], token: str) -> int:
+    '''
+    Check how many of the token given in parameter remains
+    Args
+        The board a a matrix
+        The token as a string
+    Returns
+        Returns the number of remaining tokens as an integer
+    Raise
+        No exception
+    '''
     total_count = 8
     for line in board:
         for elem in line:
@@ -288,3 +303,6 @@ def is_action(action: str) -> bool:
         The correctness of the action as a boolean
     """
     return (5==len(action)) and action[0].isalpha() and action[1].isalpha() and action[3].isalpha() and action[2].isnumeric and action[4].isnumeric
+
+def ask_play():
+    return
