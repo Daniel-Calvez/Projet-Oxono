@@ -204,3 +204,17 @@ class BoardTests:
         answers=[]
         for token in ['P_X', 'J_X', 'J_O', 'P_O', 'F_O']: answers.append(oxo.nb_token(board, token))
         assert answers==expected_answers
+    
+    def test_ask_play(self):
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', 'T_X', 'J_X', 'P_X', 'T_O', '   '],
+            ['   ', 'P_X', '   ', '   ', 'J_O', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        expected_answers = [6,7,7,8,8]
+        answers=[]
+        for token in ['P_X', 'J_X', 'J_O', 'P_O', 'F_O']: answers.append(oxo.nb_token(board, token))
+        assert answers==expected_answers
