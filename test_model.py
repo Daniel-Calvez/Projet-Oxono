@@ -188,3 +188,19 @@ class TestTotemMoves:
                           (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)}  # vertical moves
         moves = oxo.all_totem_moves(board, 'T_X')
         assert moves == expected_moves
+
+class BoardTests:
+
+    def test_nb_token(self):
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', 'T_X', 'J_X', 'P_X', 'T_O', '   '],
+            ['   ', 'P_X', '   ', '   ', 'J_O', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        expected_answers = [6,7,7,8,8]
+        answers=[]
+        for token in ['P_X', 'J_X', 'J_O', 'P_O', 'F_O']: answers.append(oxo.nb_token(board, token))
+        assert answers==expected_answers
