@@ -305,3 +305,26 @@ def is_action(action: str) -> bool:
         The correctness of the action as a boolean
     """
     return (5==len(action)) and action[0].isalpha() and action[1].isalpha() and action[3].isalpha() and action[2].isnumeric and action[4].isnumeric
+
+def ask_play(board: list[list[str]], player: str, opponent: str) -> str:
+    '''
+    Ask the player its action
+    The action should be valid (for example XB1C2)
+    Args
+        The board as a matrix
+        The player's name
+        The opponent's name
+    Returns
+        The action as a string
+    Exception
+        No exception
+    '''
+    
+    print(str_board(board))
+    valid_action = False
+    action = ""
+    while not valid_action:
+        input(f"Vous êtes {player}, quelle action souhaitez-vous faire ? ", action)
+        valid_action = is_valid_action(action)
+
+    return action
