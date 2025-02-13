@@ -281,7 +281,7 @@ def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[
     if(totem_coord[0]+1 < len(board) and board[totem_coord[0]+1][totem_coord[1]] == EMPTY_CELL): accessible_positions.append((totem_coord[0]+1, totem_coord[1]))
     if(totem_coord[1]-1 >= 0 and board[totem_coord[0]][totem_coord[1]-1] == EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]-1))
     if(totem_coord[1]+1 < len(board[0]) and board[totem_coord[0]][totem_coord[1]+1] == EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]+1))
-    return accessible_positions
+    return set(accessible_positions)
 
 def valid_player_names(player1: str, player2:str) -> bool:
     """
@@ -362,7 +362,7 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
     totem_moves = all_totem_moves(board, totem)
     totem_coord= convert_coord(action[1:3])
     if(totem_coord not in totem_moves): return False
-    token_drops = all_token_drops(board, token_drops)
+    token_drops = all_token_drops(board, totem_coord)
     token_coord= convert_coord(action[3:5])
     if(token_coord not in token_drops): return False
     return True
