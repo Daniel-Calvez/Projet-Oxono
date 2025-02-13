@@ -348,7 +348,5 @@ class BoardTests:
             ['   ', '   ', '   ', '   ', '   ', '   '],
             ['   ', '   ', '   ', '   ', '   ', '   ']
         ]
-        expected_answers = [6,7,7,8,8]
-        answers=[]
-        for token in ['P_X', 'J_X', 'J_O', 'P_O', 'F_O']: answers.append(oxo.nb_token(board, token))
+        action =  "XB1C1" 
         assert answers==expected_answers
