@@ -409,6 +409,8 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
     color_score=0
     horizontal_pos=coord[1]
     offset = -1
+    is_color=True
+    is_symbol=True
     # Same loop but horizontal
     while horizontal_pos<6:
         if(horizontal_pos<0 or not(is_color and is_symbol)):
