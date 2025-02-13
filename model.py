@@ -234,6 +234,23 @@ def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
     print(f"There are {len(all_moves)} moves possibles.")
     return all_moves
 
+def move_totem(board: list[list[str]], totem: str, coord: tuple[int, int]) -> None:
+    '''
+    Move the totem on the board, update the board
+    Assume the movement is possible
+    Args
+        The board as a matrix
+        The name of the totem to move
+        The new coordinates of the totem to move
+    Returns
+        Nothing
+    Exception
+        No exception
+    '''
+    actual_coord = find_totem(board, totem)
+    board[actual_coord[0]][actual_coord[1]] = EMPTY_CELL
+    board[coord[0]][coord[1]] = totem
+    
 def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[tuple[int,int]]:
     """
     Compute every move the player can do after moving the totem
@@ -245,10 +262,10 @@ def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[
     """
 
     accessible_positions=[]
-    if(totem_coord[0]-1>=0 and board[totem_coord[0]-1, totem_coord[1]] != EMPTY_CELL): accessible_positions.append((totem_coord[0]-1, totem_coord[1]))
-    if(totem_coord[0]+1<len(board) and board[totem_coord[0]+1, totem_coord[1]] != EMPTY_CELL): accessible_positions.append((totem_coord[0]+1, totem_coord[1]))
-    if(totem_coord[1]-1>=0 and board[totem_coord[0], totem_coord[1]-1] != EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]-1))
-    if(totem_coord[1]+1<len(board[0]) and board[totem_coord[0], totem_coord[1]+1] != EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]+1))
+    if(totem_coord[0] - 1 >= 0 and board[totem_coord[0]-1, totem_coord[1]] != EMPTY_CELL): accessible_positions.append((totem_coord[0]-1, totem_coord[1]))
+    if(totem_coord[0] + 1 < len(board) and board[totem_coord[0]+1, totem_coord[1]] != EMPTY_CELL): accessible_positions.append((totem_coord[0]+1, totem_coord[1]))
+    if(totem_coord[1] - 1 >= 0 and board[totem_coord[0], totem_coord[1]-1] != EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]-1))
+    if(totem_coord[1] + 1 < len(board[0]) and board[totem_coord[0], totem_coord[1]+1] != EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]+1))
     return accessible_positions
 
 def valid_player_names(player1: str, player2:str) -> bool:
@@ -274,10 +291,10 @@ def convert_coord(coord: str) -> tuple[int,int]:
     """
     valid_letters = ["A","B","C","D","E","F"]
     # Checks if coordinates format is valid
-    if(1>len(coord)>3 and (coord[0] not in valid_letters) and (not coord[1].isnumeric) and (1>int(coord[1])>6)):
-        raise ValueError(f"{cord} n'est pas correcte")
+    if(1 > len(coord) > 3 and (coord[0] not in valid_letters) and (not coord[1].isnumeric) and (1 > int(coord[1]) > 6)):
+        raise ValueError(f"{coord} n'est pas correcte")
     
-    return (valid_letters.index(coord[0]), int(coord[1])-1)
+    return (valid_letters.index(coord[0]), int(coord[1]) - 1)
 
 def is_action(action: str) -> bool:
     """

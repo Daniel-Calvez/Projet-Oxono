@@ -150,14 +150,134 @@ class TestJunkClass:
         except:
             assert False
 
+class TestPlayerNames:
+    def test_emptyPlayerNames(self):
+        assert False == oxo.valid_player_names("", "Bob")
+        assert False == oxo.valid_player_names("Bobby", "")
+    
+    def test_lowerCasePlayerNames(self):
+        assert False == oxo.valid_player_names("vincent", "Bob")
+        assert False == oxo.valid_player_names("Bobby", "daniel")
+    
+    def test_sameLetterPlayerNames(self):
+        assert False == oxo.valid_player_names("Bernard", "Bob")
+        assert False == oxo.valid_player_names("Victoire", "Vincent")
+    
+    def test_protectedLetterPlayerNames(self):
+        assert False == oxo.valid_player_names("Toto", "Bob")
+        assert False == oxo.valid_player_names("Bobby", "Travis")
+
+    def test_goodPlayerNames(self):
+        assert True == oxo.valid_player_names("René", "Bob")
+        assert True == oxo.valid_player_names("Daniel", "Vincent")
+
+
+class TestTokenDrops:
+    def test_fullBoard(self):
+        board = [['V_X' for _ in range(6)] for _ in range(6)]
+        board[2][3] = 'T_O'
+        assert len(oxo.all_token_drops(board, (2,3))) == 0
+
+    def test_emptyBoard(self):
+        board = oxo.init_board()
+        t_x = oxo.find_totem(board, 'T_X')
+        assert len(oxo.all_token_drops(board, t_x)) == 4
+
+    def test_corner(self):
+        board = oxo.init_board()
+        t_x = oxo.find_totem(board, 'T_X')
+        board[t_x[0]][t_x[1]] = oxo.EMPTY_CELL
+        board[0][0] = 'T_X'
+        assert len(oxo.all_token_drops(board, (0,0))) == 2
+
+    def test_classicCases(self):
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', 'T_X', 'J_X', 'P_X', 'T_O', '   '],
+            ['   ', 'P_X', '   ', '   ', 'J_O', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        t_x = oxo.find_totem(board, 'T_X')
+        assert len(oxo.all_token_drops(board, t_x)) == 2
+
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', 'P_X', 'J_X', 'P_X', 'T_O', '   '],
+            ['   ', 'P_X', 'T_X', '   ', 'J_O', '   '],
+            ['   ', '   ', 'J_O', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        t_x = oxo.find_totem(board, 'T_X')
+        assert len(oxo.all_token_drops(board, t_x)) == 1
+
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', 'P_X', 'J_X', 'P_X', 'T_O', '   '],
+            ['   ', 'P_X', 'T_X', 'P_X', 'J_O', '   '],
+            ['   ', '   ', 'J_O', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        t_x = oxo.find_totem(board, 'T_X')
+        assert len(oxo.all_token_drops(board, t_x)) == 0
+
+
+class TestConvertCoord:
+    def test_convertCoordIncorrect(self):
+        try:
+            oxo.convert_coord('YEAH')
+            assert False
+        except ValueError:
+            assert True
+
+        try:
+            oxo.convert_coord('3D')
+            assert False
+        except ValueError:
+            assert True
+
+    def test_convertCoord(self):
+        assert oxo.convert_coord('A1') == (0,0)
+        assert oxo.convert_coord('B2') == (1,1)
+        assert oxo.convert_coord('F6') == (5,5)
+
+class IsAction:
+    def test_incorrectAction(self):
+        # Incorrect totem name
+        assert oxo.is_action('AC1B1') == False
+
+        # Too short or too long
+        assert oxo.is_action('C2') == True
+        assert oxo.is_action('XC1') == True
+        assert oxo.is_action('XC1B') == True
+        assert oxo.is_action('XC1B1D2') == True
+
+        # Incorrect column
+        assert oxo.is_action('XX1B1') == False
+        assert oxo.is_action('XC1K1') == False
+
+        # Incorrect row
+        assert oxo.is_action('XC9B1') == False
+        assert oxo.is_action('XC1B8') == False
+
+
+    def test_correctAction(self):
+        assert oxo.is_action('XC1B1') == True
+        assert oxo.is_action('OC1B1') == True
+        assert oxo.is_action('XA2D4') == True
+        assert oxo.is_action('OF6E5') == True
+
 class TestTotemMoves:
     '''Test the possible moves of the totem'''
 
     def test_initPosition(self):
         ''' Test that totems are correctly placed'''
         board = oxo.init_board()
-        t_x = oxo.find_totem(board, "T_X")
-        t_o = oxo.find_totem(board, "T_O")
+        t_x = oxo.find_totem(board, 'T_X')
+        t_o = oxo.find_totem(board, 'T_O')
         assert (t_x[0] == 2 or t_x[0] == 3) and (t_x[1] == 2 or t_x[1] == 3)
         assert (t_o[0] == 2 or t_o[0] == 3) and (t_o[1] == 2 or t_o[1] == 3)
         assert t_x != t_o
@@ -188,6 +308,10 @@ class TestTotemMoves:
                           (1, 0), (2, 0), (3, 0), (4, 0), (5, 0)}  # vertical moves
         moves = oxo.all_totem_moves(board, 'T_X')
         assert moves == expected_moves
+    
+    def test_move_totem(self):
+        #@TODO Daniel
+        pass
 
 class BoardTests:
 
@@ -204,3 +328,13 @@ class BoardTests:
         answers=[]
         for token in ['P_X', 'J_X', 'J_O', 'P_O', 'F_O']: answers.append(oxo.nb_token(board, token))
         assert answers==expected_answers
+
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', 'T_X', 'P_X', 'P_X', 'P_X', '   '],
+            ['   ', 'P_X', 'P_X', 'P_X', 'P_X', '   '],
+            ['   ', 'P_X', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        assert oxo.nb_token(board, 'P_X') == 0
