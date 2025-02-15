@@ -350,3 +350,19 @@ class BoardTests:
         ]
         action =  "XB1C1" 
         assert answers==expected_answers
+    
+    def test_is_valid_action(self):
+        board = [
+            ['   ', '   ', '   ', '   ', 'T_O', '   '],
+            ['   ', '   ', '   ', '   ', 'J_O', '   '],
+            ['   ', 'T_X', 'J_X', 'P_X', '   ', '   '],
+            ['   ', 'P_X', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']]
+        player = "J"
+        assert not oxo.is_valid_action(board, player, "TB3C3")
+        assert oxo.is_valid_action(board, player, "OA1B1")
+        assert not oxo.is_valid_action(board, player, "OE1F1")
+        assert not oxo.is_valid_action(board, player, "OF1G1")
+        assert oxo.is_valid_action(board, player, "TA3A4")
+
