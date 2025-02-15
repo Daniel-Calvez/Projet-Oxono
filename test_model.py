@@ -366,3 +366,22 @@ class BoardTests:
         assert not oxo.is_valid_action(board, player, "OF1G1")
         assert oxo.is_valid_action(board, player, "TA3A4")
 
+    def test_is_winner(self):
+
+        board = [
+            ['   ', '   ', '   ', '   ', 'T_O', '   '],
+            ['   ', 'T_X', '   ', '   ', 'J_O', '   '],
+            ['   ', 'J_X', 'J_X', 'P_X', 'P_X', '   '],
+            ['   ', 'P_X', '   ', '   ', 'J_O', '   '],
+            ['   ', 'J_X', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']]
+        player = "Jacqueline"
+        assert oxo.is_winner(board,player,(2,1))
+        assert not oxo.is_winner(board,player,(3,1))
+        assert not oxo.is_winner(board,player,(4,1))
+        assert not oxo.is_winner(board,player,(1,4))
+        assert not oxo.is_winner(board,player,(-1,0))
+        assert not oxo.is_winner(board,player,(0,-1))
+        assert not oxo.is_winner(board,"AAA",(2,1))
+        assert not oxo.is_winner(board,"Player",(2,1))
+        assert not oxo.is_winner(board,player,(3,5))
