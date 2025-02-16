@@ -113,6 +113,7 @@ class TestReturnedType:
         board = [["   " for _ in range(6)] for _ in range(6)]
         board[2][2] = "T_X"
         board[3][3] = "T_O"
+        oxo.set_player1("Bobby")
         assert isinstance(oxo.is_valid_action(board, "TC2C1", "Bobby"), bool)
         assert isinstance(oxo.is_valid_action(board, "XC2C1", "Bobby"), bool)
 
@@ -121,8 +122,10 @@ class TestReturnedType:
         board = [["   " for _ in range(6)] for _ in range(6)]
         board[2][2] = "T_X"
         board[3][3] = "T_O"
+        oxo.set_player1("Bobby")
         monkeypatch.setattr("sys.stdin", StringIO("XC2C1\n"))
-        assert isinstance(oxo.ask_play(board, "Bobby"), str)
+        #monkeypatch.setattr('builtins.input', lambda _: "XC2C1")
+        assert isinstance(oxo.ask_play(board, "Bobby", "Roby"), str)
 
     def test_is_winner(self):
         """test that function is_winner returns a bool"""
@@ -239,36 +242,89 @@ class TestConvertCoord:
         except ValueError:
             assert True
 
+        try:
+            oxo.convert_coord('A0')
+            assert False
+        except ValueError:
+            assert True
+
+        try:
+            oxo.convert_coord('A9')
+            assert False
+        except ValueError:
+            assert True
+
+        try:
+            oxo.convert_coord('X5')
+            assert False
+        except ValueError:
+            assert True
+
     def test_convertCoord(self):
         assert oxo.convert_coord('A1') == (0,0)
+        assert oxo.convert_coord('A2') == (1,0)
         assert oxo.convert_coord('B2') == (1,1)
+        assert oxo.convert_coord('C5') == (4,2)
         assert oxo.convert_coord('F6') == (5,5)
 
 class IsAction:
     def test_incorrectAction(self):
         # Incorrect totem name
-        assert oxo.is_action('AC1B1') == False
+        assert oxo.is_action('AC1B1') is False
 
         # Too short or too long
-        assert oxo.is_action('C2') == True
-        assert oxo.is_action('XC1') == True
-        assert oxo.is_action('XC1B') == True
-        assert oxo.is_action('XC1B1D2') == True
+        assert oxo.is_action('C2') is True
+        assert oxo.is_action('XC1') is True
+        assert oxo.is_action('XC1B') is True
+        assert oxo.is_action('XC1B1D2') is True
 
         # Incorrect column
-        assert oxo.is_action('XX1B1') == False
-        assert oxo.is_action('XC1K1') == False
+        assert oxo.is_action('XX1B1') is False
+        assert oxo.is_action('XC1K1') is False
 
         # Incorrect row
-        assert oxo.is_action('XC9B1') == False
-        assert oxo.is_action('XC1B8') == False
+        assert oxo.is_action('XC9B1') is False
+        assert oxo.is_action('XC1B8') is False
 
 
     def test_correctAction(self):
-        assert oxo.is_action('XC1B1') == True
-        assert oxo.is_action('OC1B1') == True
-        assert oxo.is_action('XA2D4') == True
-        assert oxo.is_action('OF6E5') == True
+        assert oxo.is_action('XC1B1') is True
+        assert oxo.is_action('OC1B1') is True
+        assert oxo.is_action('XA2D4') is True
+        assert oxo.is_action('OF6E5') is True
+
+    def test_isValidActionIncorrect(self):
+        board = oxo.init_board()
+        # Incorrect action
+        assert oxo.is_valid_action(board, "action", "Player1") is False
+        # Full board
+        board = [['P_X' for _ in range(6)] for _ in range(6)]
+        board[2][3] = 'T_X'
+        assert oxo.is_valid_action(board, "OC1B1", "Player1") is False
+        # Totem move impossible
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', 'T_X', 'J_X', 'P_X', 'T_O', '   '],
+            ['   ', 'P_X', '   ', '   ', 'J_O', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        assert oxo.is_valid_action(board, "XC3C4", "Player1") is False
+
+    def test_isValidActionCorrect(self):
+        # First move
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', 'T_X', '   ', '   ', '   '],
+            ['   ', '   ', '   ', 'T_O', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        assert oxo.is_valid_action(board, "OC4D4", "Player1") is False
+
+
 
 class TestTotemMoves:
     '''Test the possible moves of the totem'''
@@ -287,7 +343,7 @@ class TestTotemMoves:
         board = oxo.init_board()
         print(oxo.str_board(board))
         moves = oxo.all_totem_moves(board, 'T_X')
-        assert len(moves) == 10
+        assert len(moves) is 10
 
     def test_noMovePossible(self):
         ''' Test a totem can't move if the board is full'''
@@ -339,7 +395,7 @@ class BoardTests:
         ]
         assert oxo.nb_token(board, 'P_X') == 0
     
-    def test_ask_play(self):
+    def test_ask_play(self, monkeypatch):
         board = [
             ['   ', '   ', '   ', '   ', '   ', '   '],
             ['   ', '   ', '   ', '   ', '   ', '   '],
@@ -348,5 +404,7 @@ class BoardTests:
             ['   ', '   ', '   ', '   ', '   ', '   '],
             ['   ', '   ', '   ', '   ', '   ', '   ']
         ]
-        action =  "XB1C1" 
-        assert answers==expected_answers
+        action =  "XB1C1"
+        monkeypatch.setattr('builtins.input', lambda _: action)
+        oxo.set_player1("Player1")
+        assert oxo.test_ask_play(board, "Player1", "Alice") is action

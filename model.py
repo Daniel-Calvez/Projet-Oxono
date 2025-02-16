@@ -1,7 +1,16 @@
+'''
+Oxono game's model
+M1 Bio-info project
+Daniel Calvez & Vincent Ducot
+2025
+'''
+
 import random as rd
 from icecream import ic
+from colorama import Fore, Back, Style
 
 EMPTY_CELL = '   '
+pink_player = ""
 ic.configureOutput(includeContext=True)
 
 class TotemException(Exception):
@@ -28,6 +37,20 @@ def init_board() -> list[list[str]]:
     board[pos_totem_X[0]][pos_totem_X[1]] = "T_X"
     return board
 
+def set_player1(player: str) -> None:
+    '''
+    Defines the player one, which have the pink pawn's color
+    ! Modify the global variable !
+    Args
+        The player1's name
+    Returns
+        None
+    Exception
+        No exception
+    '''
+    global pink_player
+    pink_player = player
+
 def str_board(board: list[list[str]]) -> str:
     '''
     Returns a string representing the board
@@ -40,8 +63,38 @@ def str_board(board: list[list[str]]) -> str:
     '''
     displayed_board = "\n    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮\n"
     for i in range(len(board)):
-        displayed_board += f"{i} "+''.join([str(f"|{cell}") for cell in board[i]])+"|\n"
-        if(i <5):
+        displayed_board += f"{i+1} "+''.join([str(f"|{cell}") for cell in board[i]])+"|\n"
+        if i < 5:
+            displayed_board += "  ├───┼───┼───┼───┼───┼───┤\n"
+    displayed_board += "  ╰───┴───┴───┴───┴───┴───╯"
+    return displayed_board
+
+def str_board_colored(board: list[list[str]], player1: str, player2: str) -> str:
+    '''
+    Returns a string representing the board, with color for each player and totems
+    Args
+        The board as a matrix
+        The first player's name
+        The second player's name
+    Returns
+        A string representing the board
+    Raise
+        No exception
+    '''
+    displayed_board = "\n    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮\n"
+    for i, line in enumerate(board):
+        displayed_board += f"{i+1} "
+        for cell in line:
+            # Colorize according the cell type
+            if cell[0] == 'T':
+                color_cell = Fore.CYAN + cell + Style.RESET_ALL
+            elif cell[0] == pink_player[0]:
+                color_cell = Fore.MAGENTA + cell + Style.RESET_ALL
+            else:
+                color_cell = Fore.GREEN + cell + Style.RESET_ALL
+            displayed_board += f"|{color_cell}"
+        displayed_board += "|\n"
+        if i < 5:
             displayed_board += "  ├───┼───┼───┼───┼───┼───┤\n"
     displayed_board += "  ╰───┴───┴───┴───┴───┴───╯"
     return displayed_board
@@ -59,7 +112,7 @@ def find_totem(board: list[list[str]], totem: str) -> tuple[int,int]:
             the totem's name is not T_X or T_O
             the totem has not been found
     '''
-    if not (totem == "T_X" or totem == "T_O"):
+    if not totem in ("T_X", "T_O"):
         raise ValueError("Totem's name is not T_X or T_O.")
     for i in range(len(board)):
         for j in range(len(board[i])):
@@ -81,7 +134,8 @@ def nb_token(board: list[list[str]], token: str) -> int:
     total_count = 8
     for line in board:
         for elem in line:
-            if elem == token: total_count -= 1 
+            if elem == token:
+                total_count -= 1 
     return total_count
 
 
@@ -173,7 +227,7 @@ def row_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
             if board[x][row] == EMPTY_CELL:
                 moves.add((x, row))
                 break
-    print(f"Found {len(moves)} for direction {direction}")
+    #print(f"Found {len(moves)} for direction {direction}")
     return moves
 
 def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: str) -> set[tuple[int,int]]:
@@ -217,7 +271,7 @@ def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
             if board[col][y] == EMPTY_CELL:
                 moves.add((col, y))
                 break
-    print(f"Found {len(moves)} for direction {direction}")
+    #print(f"Found {len(moves)} for direction {direction}")
     return moves
 
 def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
@@ -246,7 +300,7 @@ def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
     all_moves.update(col_totem_moves(board, (totem_x, totem_y), 'up'))
     all_moves.update(col_totem_moves(board, (totem_x, totem_y), 'down'))
 
-    print(f"There are {len(all_moves)} moves possibles.")
+    #print(f"There are {len(all_moves)} moves possibles.")
     return all_moves
 
 def move_totem(board: list[list[str]], totem: str, coord: tuple[int, int]) -> None:
@@ -277,10 +331,14 @@ def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[
     """
 
     accessible_positions=[]
-    if(totem_coord[0]-1 >= 0 and board[totem_coord[0]-1][totem_coord[1]] == EMPTY_CELL): accessible_positions.append((totem_coord[0]-1, totem_coord[1]))
-    if(totem_coord[0]+1 < len(board) and board[totem_coord[0]+1][totem_coord[1]] == EMPTY_CELL): accessible_positions.append((totem_coord[0]+1, totem_coord[1]))
-    if(totem_coord[1]-1 >= 0 and board[totem_coord[0]][totem_coord[1]-1] == EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]-1))
-    if(totem_coord[1]+1 < len(board[0]) and board[totem_coord[0]][totem_coord[1]+1] == EMPTY_CELL): accessible_positions.append((totem_coord[1], totem_coord[1]+1))
+    if(totem_coord[0]-1 >= 0 and board[totem_coord[0]-1][totem_coord[1]] == EMPTY_CELL):
+        accessible_positions.append((totem_coord[0]-1, totem_coord[1]))
+    if(totem_coord[0]+1 < len(board) and board[totem_coord[0]+1][totem_coord[1]] == EMPTY_CELL):
+        accessible_positions.append((totem_coord[0]+1, totem_coord[1]))
+    if(totem_coord[1]-1 >= 0 and board[totem_coord[0]][totem_coord[1]-1] == EMPTY_CELL):
+        accessible_positions.append((totem_coord[1], totem_coord[1]-1))
+    if(totem_coord[1]+1 < len(board[0]) and board[totem_coord[0]][totem_coord[1]+1] == EMPTY_CELL):
+        accessible_positions.append((totem_coord[1], totem_coord[1]+1))
     return set(accessible_positions)
 
 def valid_player_names(player1: str, player2:str) -> bool:
@@ -297,19 +355,23 @@ def valid_player_names(player1: str, player2:str) -> bool:
     return len(player1)>0 and len(player2)>0 and (player1[0]!=player2[0]) and (player1[0]!="T") and (player2[0]!="T") and (player1[0].isupper()) and (player2[0].isupper())
 
 def convert_coord(coord: str) -> tuple[int,int]:
-    """
+    '''
     Convert the coordinates given by the player as a position in the board
+    Examples
+        A2 => (1,0)
+        C5 => (4,2)
     Args
         The coordinates as a string
     Returns
         The coordinates as a tuple
-    """
+    '''
     valid_letters = ["A","B","C","D","E","F"]
     # Checks if coordinates format is valid
-    if(1 > len(coord) > 3 and (coord[0] not in valid_letters) and (not coord[1].isnumeric) and (1 > int(coord[1]) > 6)):
+    if(len(coord) != 2 or (coord[0] not in valid_letters) or
+        (not coord[1].isnumeric) or (not 1 <= int(coord[1]) <= 6)):
         raise ValueError(f"{coord} n'est pas correcte")
-    
-    return (valid_letters.index(coord[0]), int(coord[1]) - 1)
+
+    return (int(coord[1]) - 1, valid_letters.index(coord[0]))
 
 def is_action(action: str) -> bool:
     """
@@ -320,6 +382,47 @@ def is_action(action: str) -> bool:
         The correctness of the action as a boolean
     """
     return (5==len(action)) and (action[0]=="O" or action[0]=="X") and action[1].isalpha() and action[3].isalpha() and action[2].isnumeric() and action[4].isnumeric()
+
+def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
+    '''
+    Look if the action is valid and doable
+    Args
+        The board as a matrix
+        The action as a string
+        The player's name
+    Returns
+        The validity of the action as a boolean
+    Exception
+        No exception
+    '''
+    if not is_action(action):
+        print("Not an action")
+        return False
+    if action[0] == "X":
+        if nb_token(board, player[0]+"_X") <= 0:
+            print("No token left")
+            return False
+        totem = "T_X"
+    else:
+        if nb_token(board, player[0]+"_O") <= 0:
+            print("No token left")
+            return False
+        totem = "T_O"
+
+    totem_moves = all_totem_moves(board, totem)
+    totem_coord = convert_coord(action[1:3])
+
+    if totem_coord not in totem_moves:
+        print("Totem move impossible")
+        return False
+
+    token_drops = all_token_drops(board, totem_coord)
+    token_coord= convert_coord(action[3:5])
+
+    if token_coord not in token_drops:
+        print("Token move impossible")
+        return False
+    return True
 
 def ask_play(board: list[list[str]], player: str, opponent: str) -> str:
     '''
@@ -335,37 +438,15 @@ def ask_play(board: list[list[str]], player: str, opponent: str) -> str:
         No exception
     '''
     
-    print(str_board(board))
+    print(str_board_colored(board, player, opponent))
     valid_action = False
     action = ""
     while not valid_action:
-        input(f"Vous êtes {player}, quelle action souhaitez-vous faire ? ", action)
-        valid_action = is_valid_action(action)
+        action = input(f"Vous êtes {player}, quelle action souhaitez-vous faire ? ")
+        valid_action = is_valid_action(board, action, player)
+        print(f"Is {action} a valid action ? {valid_action}")
 
     return action
-
-def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
-    '''
-    Look if the action is valid and doable
-    Args
-        The board as a matrix
-        The action as a string
-        The player's name
-    Returns
-        The validity of the action as a boolean
-    Exception
-        No exception
-    '''
-    if(not is_action(action)): return False
-    if(action[0] == "X"): totem = "T_X"
-    else: totem = "T_O"
-    totem_moves = all_totem_moves(board, totem)
-    totem_coord= convert_coord(action[1:3])
-    if(totem_coord not in totem_moves): return False
-    token_drops = all_token_drops(board, totem_coord)
-    token_coord= convert_coord(action[3:5])
-    if(token_coord not in token_drops): return False
-    return True
 
 def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> bool:
     '''
@@ -381,30 +462,35 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
     '''
     # Get the token from rhe coordinates and check if it belongs to the player
     token = board[coord[0]][coord[1]]
-    if(token[0]!=player[0]): return False
+    if token[0] != player[0]:
+        return False
+
     symbol_score=0
     color_score=0
     vertical_pos=coord[0]
     offset = -1
     is_color=True
     is_symbol=True
-    # This loops parse backward vertically , checking the symbol and color
+    # This loops parse backward vertically, checking the symbol and color
     # and going the other way if there is no token, a different symbol and color or if out of bounds
     while vertical_pos<6:
         if(vertical_pos==-1 or not(is_color and is_symbol)):
             vertical_pos=coord[0] +1
             offset = 1
-        if(is_symbol and board[vertical_pos][coord[1]][2]== token[2]): symbol_score +=1
+        if(is_symbol and board[vertical_pos][coord[1]][2]== token[2]):
+            symbol_score +=1
         else:
             is_symbol=False
 
-        if(is_color and board[vertical_pos][coord[1]][0]== token[0]): color_score +=1
+        if(is_color and board[vertical_pos][coord[1]][0]== token[0]):
+            color_score +=1
         else:
             is_color=False
-        
-        if(symbol_score==4 or color_score==4): return True
+
+        if(symbol_score==4 or color_score==4):
+            return True
         vertical_pos += offset
-    
+
     symbol_score=0
     color_score=0
     horizontal_pos=coord[1]
@@ -416,14 +502,17 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
         if(horizontal_pos<0 or not(is_color and is_symbol)):
             horizontal_pos=coord[1] +1
             offset = 1
-        if(is_symbol and board[coord[0]][horizontal_pos][2]== token[2]): symbol_score +=1
+        if(is_symbol and board[coord[0]][horizontal_pos][2]== token[2]):
+            symbol_score +=1
         else:
             is_symbol=False
 
-        if(is_color and board[coord[0]][horizontal_pos][0]== token[0]): color_score +=1
+        if(is_color and board[coord[0]][horizontal_pos][0]== token[0]):
+            color_score +=1
         else:
             is_color=False
-        
-        if(symbol_score==4 or color_score==4): return True
-        horizontal_pos += offset    
+
+        if(symbol_score==4 or color_score==4):
+            return True
+        horizontal_pos += offset
     return False
