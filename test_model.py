@@ -153,10 +153,9 @@ class TestPlayerNames:
         assert oxo.valid_player_names("Victoire", "Vincent") is False
 
     def test_protected_letter_player_names(self):
-        ''' Test if names with X or O as first letter are accepted'''
+        ''' Test if names with T as first letter are accepted'''
         assert oxo.valid_player_names("Toto", "Bob") is False
         assert oxo.valid_player_names("Bobby", "Travis") is False
-        assert oxo.valid_player_names("Bobby", "Olga") is False
 
     def test_good_player_names(self):
         ''' Test if valid names are accepted'''
