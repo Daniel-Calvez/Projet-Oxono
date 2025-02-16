@@ -46,13 +46,16 @@ while True:
     # Move pawn
     board[token_coord[0]][token_coord[1]] = token
     # Check if active player wins
+    print(is_winner(board, active_player, token_coord))
     if is_winner(board, active_player, token_coord):
         print(f"{active_player} gagne la partie! GG!")
+        print(str_board_colored(board))
         sys.exit(0)
     # Check if no pawns left
     elif nb_token(board, active_player[0]+'_X') + nb_token(board, active_player[0]+'_O') + \
         nb_token(board, opponent[0]+'_X') + nb_token(board, opponent[0]+'_O') == 0:
         print("Aucun pion restant, match nul")
+        print(str_board_colored(board))
         sys.exit(0)
     else:
         tmp = active_player

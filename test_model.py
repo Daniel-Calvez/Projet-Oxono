@@ -335,6 +335,8 @@ class IsAction:
             ['   ', '   ', '   ', '   ', '   ', '   ']
         ]
         assert oxo.is_valid_action(board, "XC3C4", "Player1") is False
+        assert oxo.is_valid_action(board, "XB1B2", "Player1") is True
+
 
     def test_is_valid_action_correct(self):
         ''' Try to validate possible actions'''
