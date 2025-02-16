@@ -7,17 +7,16 @@ Daniel Calvez & Vincent Ducot
 
 import random as rd
 from icecream import ic
-from colorama import Fore, Back, Style
+from colorama import Fore, Style
 
 EMPTY_CELL = '   '
-pink_player = ""
+PINK_PLAYER = ""
 ic.configureOutput(includeContext=True)
 
 class TotemException(Exception):
     '''
     Exception related to the token
     '''
-    pass
 
 def init_board() -> list[list[str]]:
     '''
@@ -48,8 +47,8 @@ def set_player1(player: str) -> None:
     Exception
         No exception
     '''
-    global pink_player
-    pink_player = player
+    global PINK_PLAYER
+    PINK_PLAYER = player
 
 def str_board(board: list[list[str]]) -> str:
     '''
@@ -88,7 +87,7 @@ def str_board_colored(board: list[list[str]], player1: str, player2: str) -> str
             # Colorize according the cell type
             if cell[0] == 'T':
                 color_cell = Fore.CYAN + cell + Style.RESET_ALL
-            elif cell[0] == pink_player[0]:
+            elif cell[0] == PINK_PLAYER[0]:
                 color_cell = Fore.MAGENTA + cell + Style.RESET_ALL
             else:
                 color_cell = Fore.GREEN + cell + Style.RESET_ALL
@@ -114,8 +113,8 @@ def find_totem(board: list[list[str]], totem: str) -> tuple[int,int]:
     '''
     if not totem in ("T_X", "T_O"):
         raise ValueError("Totem's name is not T_X or T_O.")
-    for i in range(len(board)):
-        for j in range(len(board[i])):
+    for i, line in enumerate(board):
+        for j, _ in enumerate(line):
             if board[i][j] == totem:
                 return (i,j)
     raise ValueError("Totem is not in the board.")
@@ -135,7 +134,7 @@ def nb_token(board: list[list[str]], token: str) -> int:
     for line in board:
         for elem in line:
             if elem == token:
-                total_count -= 1 
+                total_count -= 1
     return total_count
 
 
@@ -170,7 +169,7 @@ def is_landlocked(board: list[list[str]], coord: tuple[int,int]) -> bool:
     if y + 1 < len(board[x]) + 1:
         if board[x][y+1] == EMPTY_CELL:
             return False
-        
+
     return True
 
 def all_free_cells(board: list[list[str]]) -> set[tuple[int,int]]:
@@ -183,7 +182,8 @@ def all_free_cells(board: list[list[str]]) -> set[tuple[int,int]]:
     Raise
         No exception
     '''
-    cells = [board[row][col] for row in range(len(board)) for col in range(len(board[row])) if board[row][col] == EMPTY_CELL]
+    cells = [board[row][col] for row in range(len(board)) \
+             for col in range(len(board[row])) if board[row][col] == EMPTY_CELL]
     return set(cells)
 
 def row_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: str) -> set[tuple[int,int]]:
@@ -216,8 +216,7 @@ def row_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
         # Add moves until meet an obstacle
         if board[x][row] != EMPTY_CELL:
             break
-        else:
-            moves.add((x, row))
+        moves.add((x, row))
 
     # If no move is possible, maybe jumping is possible
     if len(moves) == 0:
@@ -260,8 +259,7 @@ def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
         # Add moves until meet an obstacle
         if board[col][y] != EMPTY_CELL:
             break
-        else:
-            moves.add((col, y))
+        moves.add((col, y))
 
     # If no move is possible, maybe jumping is possible
     if len(moves) == 0:
@@ -289,11 +287,11 @@ def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
     totem_x, totem_y = find_totem(board,  totem)
 
     all_moves = set()
-    
+
     # If totem's row and column is full, it can move everywhere on the board
     if is_landlocked(board, (totem_x, totem_y)):
         return all_free_cells(board)
-    
+
     # Add all moves in each direction, including cell's jump
     all_moves.update(row_totem_moves(board, (totem_x, totem_y), 'right'))
     all_moves.update(row_totem_moves(board, (totem_x, totem_y), 'left'))
@@ -319,7 +317,7 @@ def move_totem(board: list[list[str]], totem: str, coord: tuple[int, int]) -> No
     actual_coord = find_totem(board, totem)
     board[actual_coord[0]][actual_coord[1]] = EMPTY_CELL
     board[coord[0]][coord[1]] = totem
-    
+
 def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[tuple[int,int]]:
     """
     Compute every move the player can do after moving the totem
@@ -352,7 +350,9 @@ def valid_player_names(player1: str, player2:str) -> bool:
         The validity of the player names as a boolean
     """
 
-    return len(player1)>0 and len(player2)>0 and (player1[0]!=player2[0]) and (player1[0]!="T") and (player2[0]!="T") and (player1[0].isupper()) and (player2[0].isupper())
+    return len(player1)>0 and len(player2)>0 and (player1[0]!=player2[0]) and \
+        (player1[0]!="T") and (player2[0]!="T") and \
+            (player1[0].isupper()) and (player2[0].isupper())
 
 def convert_coord(coord: str) -> tuple[int,int]:
     '''
@@ -381,7 +381,9 @@ def is_action(action: str) -> bool:
     Returns
         The correctness of the action as a boolean
     """
-    return (5==len(action)) and (action[0]=="O" or action[0]=="X") and action[1].isalpha() and action[3].isalpha() and action[2].isnumeric() and action[4].isnumeric()
+    return (5==len(action)) and (action[0]=="O" or action[0]=="X") and \
+        action[1].isalpha() and action[3].isalpha() and \
+            action[2].isnumeric() and action[4].isnumeric()
 
 def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
     '''
@@ -437,7 +439,7 @@ def ask_play(board: list[list[str]], player: str, opponent: str) -> str:
     Exception
         No exception
     '''
-    
+
     print(str_board_colored(board, player, opponent))
     valid_action = False
     action = ""
