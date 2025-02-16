@@ -221,6 +221,28 @@ class TestTokenDrops:
         t_x = oxo.find_totem(board, 'T_X')
         assert len(oxo.all_token_drops(board, t_x)) == 0
 
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['T_X', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', 'T_O', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        t_x = oxo.find_totem(board, 'T_X')
+        drops = oxo.all_token_drops(board, t_x)
+        assert len(drops) == 3
+        assert (1,0) in drops
+        assert (3,0) in drops
+        assert (2,1) in drops
+
+        t_o = oxo.find_totem(board, 'T_O')
+        drops = oxo.all_token_drops(board, t_o)
+        assert len(drops) == 4
+        assert (2,3) in drops
+        assert (3,2) in drops
+        assert (3,4) in drops
+        assert (4,3) in drops
 
 class TestConvertCoord:
     ''' Test convert coord from human instruction to matrix coord'''

@@ -137,7 +137,6 @@ def nb_token(board: list[list[str]], token: str) -> int:
                 total_count -= 1
     return total_count
 
-
 def is_landlocked(board: list[list[str]], coord: tuple[int,int]) -> bool:
     '''
     Return if the cell is landlocked, ie surrounded by other pawns, totem or border
@@ -419,7 +418,7 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
         return False
 
     token_drops = all_token_drops(board, totem_coord)
-    token_coord= convert_coord(action[3:5])
+    token_coord = convert_coord(action[3:5])
 
     if token_coord not in token_drops:
         print("Token move impossible")
