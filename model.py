@@ -380,9 +380,11 @@ def is_action(action: str) -> bool:
     Returns
         The correctness of the action as a boolean
     """
-    return (5==len(action)) and (action[0]=="O" or action[0]=="X") and \
-        action[1].isalpha() and action[3].isalpha() and \
-            action[2].isnumeric() and action[4].isnumeric()
+    return (len(action) == 5) and (action[0]=="O" or action[0]=="X") and \
+        action[1].isalpha() and 'A' <= action[1] <= 'F' and \
+            action[3].isalpha() and 'A' <= action[3] <= 'F' and \
+            action[2].isnumeric() and 1 <= int(action[2]) <= 6 and \
+                action[4].isnumeric() and 1 <= int(action[4]) <= 6
 
 def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
     '''
@@ -419,8 +421,10 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
 
     token_drops = all_token_drops(board, totem_coord)
     token_coord = convert_coord(action[3:5])
-    
-    if abs(curr_coord_totem[0] - totem_coord[0] + curr_coord_totem[1] - totem_coord[1]) == 1: token_drops.add(curr_coord_totem)
+
+    if abs(curr_coord_totem[0] - totem_coord[0] + curr_coord_totem[1] - totem_coord[1]) == 1:
+        token_drops.add(curr_coord_totem)
+
     if token_coord not in token_drops:
         print("Token move impossible")
         return False
@@ -462,17 +466,17 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
     Exception
         No exception
     '''
-    # Get the token from rhe coordinates and check if it belongs to the player
+    # Get the token from the coordinates and check if it belongs to the player
     token = board[coord[0]][coord[1]]
     if token[0] != player[0]:
         return False
 
-    symbol_score=0
-    color_score=0
-    vertical_pos=coord[0]
+    symbol_score = 0
+    color_score = 0
+    vertical_pos = coord[0]
     offset = -1
-    is_color=True
-    is_symbol=True
+    is_color = True
+    is_symbol = True
     # This loops parse backward vertically, checking the symbol and color
     # and going the other way if there is no token, a different symbol and color or if out of bounds
     while vertical_pos<6:
@@ -482,24 +486,25 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
         if(is_symbol and board[vertical_pos][coord[1]][2]== token[2] and token[0]!="T"):
             symbol_score +=1
         else:
-            is_symbol=False
+            is_symbol = False
 
-        if(is_color and board[vertical_pos][coord[1]][0]== token[0]):
-            color_score +=1
+        if(is_color and board[vertical_pos][coord[1]][0] == token[0]):
+            color_score += 1
         else:
             is_color=False
         if(symbol_score==4 or color_score==4):
             return True
-        if(not(is_color or is_symbol)and offset>0): break
+        if(not(is_color or is_symbol)and offset>0):
+            break
 
         vertical_pos += offset
 
-    symbol_score=0
-    color_score=0
-    horizontal_pos=coord[1]
+    symbol_score = 0
+    color_score = 0
+    horizontal_pos = coord[1]
     offset = -1
-    is_color=True
-    is_symbol=True
+    is_color = True
+    is_symbol = True
     # Same loop but horizontal
     while horizontal_pos<6:
         if(horizontal_pos<0 or not(is_color or is_symbol)):
@@ -508,14 +513,15 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
         if(is_symbol and board[coord[0]][horizontal_pos][2]==token[2] and token[0]!="T"):
             symbol_score +=1
         else:
-            is_symbol=False
+            is_symbol = False
 
-        if(is_color and board[coord[0]][horizontal_pos][0]== token[0]):
-            color_score +=1
+        if(is_color and board[coord[0]][horizontal_pos][0] == token[0]):
+            color_score += 1
         else:
             is_color=False
         if(symbol_score==4 or color_score==4):
             return True
-        if(not(is_color or is_symbol)and offset>0): break
+        if(not(is_color or is_symbol)and offset>0):
+            break
         horizontal_pos += offset
     return False

@@ -286,7 +286,7 @@ class TestConvertCoord:
         assert oxo.convert_coord('C5') == (4,2)
         assert oxo.convert_coord('F6') == (5,5)
 
-class IsAction:
+class TestAction:
     ''' Tests for action reading and correctness'''
 
     def test_incorrect_action(self):
@@ -295,10 +295,10 @@ class IsAction:
         assert oxo.is_action('AC1B1') is False
 
         # Too short or too long
-        assert oxo.is_action('C2') is True
-        assert oxo.is_action('XC1') is True
-        assert oxo.is_action('XC1B') is True
-        assert oxo.is_action('XC1B1D2') is True
+        assert oxo.is_action('C2') is False
+        assert oxo.is_action('XC1') is False
+        assert oxo.is_action('XC1B') is False
+        assert oxo.is_action('XC1B1D2') is False
 
         # Incorrect column
         assert oxo.is_action('XX1B1') is False
@@ -324,7 +324,7 @@ class IsAction:
         # Full board
         board = [['P_X' for _ in range(6)] for _ in range(6)]
         board[2][3] = 'T_X'
-        assert oxo.is_valid_action(board, "OC1B1", "Player1") is False
+        assert oxo.is_valid_action(board, "XC1B1", "Player1") is False
         # Totem move impossible
         board = [
             ['   ', '   ', '   ', '   ', '   ', '   '],
@@ -349,9 +349,7 @@ class IsAction:
             ['   ', '   ', '   ', '   ', '   ', '   '],
             ['   ', '   ', '   ', '   ', '   ', '   ']
         ]
-        assert oxo.is_valid_action(board, "OC4D4", "Player1") is False
-
-
+        assert oxo.is_valid_action(board, "OC4D4", "Player1") is True
 
 class TestTotemMoves:
     '''Test the possible moves of the totem'''
@@ -387,7 +385,7 @@ class TestTotemMoves:
         board = oxo.init_board()
         print(oxo.str_board(board))
         moves = oxo.all_totem_moves(board, 'T_X')
-        assert len(moves) is 10
+        assert len(moves) == 10
 
     def test_no_move_possible(self):
         ''' Test a totem can't move if the board is full'''
@@ -414,7 +412,7 @@ class TestTotemMoves:
         ''' Test to move the totem '''
         #@TODO Daniel
 
-class BoardTests:
+class TestBoard:
     ''' Tests of the board'''
 
     def test_nb_token(self):
@@ -454,6 +452,44 @@ class BoardTests:
             ['   ', '   ', '   ', '   ', '   ', '   ']
         ]
         action =  "XB1C1"
-        monkeypatch.setattr('builtins.input', lambda _: action)
+        #monkeypatch.setattr('builtins.input', lambda _: action)
+        monkeypatch.setattr("sys.stdin", StringIO(f"{action}\n"))
         oxo.set_player1("Player1")
-        assert oxo.test_ask_play(board, "Player1", "Alice") is action
+        assert oxo.ask_play(board, "Player1", "Alice") == action
+
+class TestEndGame:
+    ''' Tests for winning or draw '''
+
+    def test_color_winning(self):
+        ''' A wins with its color (= letter A)'''
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', 'T_X', 'A_X', 'B_X', 'T_O', '   '],
+            ['A_O', 'A_X', 'A_X', 'A_O', 'B_O', '   '],
+            ['   ', 'B_X', 'B_O', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        assert oxo.is_winner(board, "Alphonse", (4,1)) is False
+        assert oxo.is_winner(board, "Brigitte", (4,1)) is False
+        assert oxo.is_winner(board, "Alphonse", (3,0)) is True
+        assert oxo.is_winner(board, "Alphonse", (3,1)) is True
+        assert oxo.is_winner(board, "Alphonse", (3,2)) is True
+        assert oxo.is_winner(board, "Alphonse", (3,3)) is True
+
+    def test_symbol_winning(self):
+        ''' A wins with 4 symbols'''
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', 'T_X', 'A_X', 'B_X', 'T_O', '   '],
+            ['A_X', 'A_X', 'A_X', 'A_X', 'B_O', '   '],
+            ['   ', 'B_X', 'B_O', 'B_O', 'B_O', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        assert oxo.is_winner(board, "Alphonse", (4,1)) is False
+        assert oxo.is_winner(board, "Brigitte", (4,1)) is False
+        assert oxo.is_winner(board, "Alphonse", (3,0)) is True
+        assert oxo.is_winner(board, "Alphonse", (3,1)) is True
+        assert oxo.is_winner(board, "Alphonse", (3,2)) is True
+        assert oxo.is_winner(board, "Alphonse", (3,3)) is True
