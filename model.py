@@ -372,6 +372,26 @@ def convert_coord(coord: str) -> tuple[int,int]:
 
     return (int(coord[1]) - 1, valid_letters.index(coord[0]))
 
+def reverse_convert_coord(coord: tuple[int, int]) -> str:
+    '''
+    Convert a tuple of coordinates into a string position on the board
+    Examples
+        (1, 0) => "A2"
+        (4, 2) => "C5"
+    Args:
+        The coordinates as a tuple
+    Returns:
+        The coordinates as a string
+    '''
+    valid_letters = ["A","B","C","D","E","F"]
+    
+    # Check if the tuple coordinates are within valid bounds
+    if not (0 <= coord[0] <= 5 and 0 <= coord[1] <= 5):
+        raise ValueError(f"Coordonnées {coord} incorrectes")
+    
+    # Return the coordinates in string format
+    return f"{valid_letters[coord[1]]}{coord[0] + 1}"
+
 def is_action(action: str) -> bool:
     """
     Checks is the action format is correct
@@ -433,7 +453,6 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
 def ask_play(board: list[list[str]], player: str, opponent: str) -> str:
     '''
     Ask the player its action
-    The action should be valid (for example XB1C2)
     Args
         The board as a matrix
         The player's name

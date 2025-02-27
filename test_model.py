@@ -286,6 +286,14 @@ class TestConvertCoord:
         assert oxo.convert_coord('C5') == (4,2)
         assert oxo.convert_coord('F6') == (5,5)
 
+    def test_reverse_convert_coord(self):
+        ''' Test coord are correctly converted'''
+        assert oxo.reverse_convert_coord((0,0)) == ('A1')
+        assert oxo.reverse_convert_coord((1,0)) == ('A2')
+        assert oxo.reverse_convert_coord((1,1)) == ('B2')
+        assert oxo.reverse_convert_coord((4,2)) == ('C5')
+        assert oxo.reverse_convert_coord((5,5)) == ('F6')
+
 class TestAction:
     ''' Tests for action reading and correctness'''
 
