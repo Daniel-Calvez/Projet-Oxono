@@ -140,7 +140,7 @@ def nb_token(board: list[list[str]], token: str) -> int:
 def is_landlocked(board: list[list[str]], coord: tuple[int,int]) -> bool:
     '''
     Return if the cell is landlocked, ie surrounded by other pawns, totem or border
-    If a totem is landlocked, the player can play its pawn wherever he wants
+    If a totem is landlocked, the player can make it jump on its row or column
     Args
         The board as a matrix
         The coordinates of the cell to check
@@ -165,9 +165,54 @@ def is_landlocked(board: list[list[str]], coord: tuple[int,int]) -> bool:
         if board[x][y-1] == EMPTY_CELL:
             return False
     # Right
-    if y + 1 < len(board[x]) + 1:
+    if y + 1 < len(board[x]) - 1:
         if board[x][y+1] == EMPTY_CELL:
             return False
+
+    return True
+
+def is_totem_fully_landlocked(board: list[list[str]], coord: tuple[int,int]) -> bool:
+    '''
+    Return if the totem is fully landlocked, ie its row or column are full
+    If a totem is landlocked, the player can play its pawn wherever he wants
+    Args
+        The board as a matrix
+        The coordinates of the cell to check
+    Returns
+        True is the cell is landlocked, else False
+    Raise
+        ValueError if the cell does not belong to the board
+    '''
+    x = coord[0]
+    y = coord[1]
+
+    # Up
+    if x - 1 >= 0:
+        row = x-1
+        while row >= 0:
+            if board[row][y] == EMPTY_CELL:
+                return False
+            row -= 1
+
+    # Down
+    if x + 1 < len(board) - 1:
+        for row in range(x+1, len(board)):
+            if board[row][y] == EMPTY_CELL:
+                return False
+            
+    # Left
+    if y - 1 >= 0:
+        col = y-1
+        while col >= 0:
+            if board[x][col] == EMPTY_CELL:
+                return False
+            col -= 1
+
+    # Right
+    if y + 1 < len(board[x]) - 1:
+        for col in range(y+1, len(board[x])):
+            if board[x][col] == EMPTY_CELL:
+                return False
 
     return True
 
@@ -218,14 +263,18 @@ def row_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
         moves.add((x, row))
 
     # If no move is possible, maybe jumping is possible
-    if len(moves) == 0:
+    if len(moves) == 0 and is_landlocked(board, coord):
         # Find next empty cell
         # @TODO: combine with the previous loop ?
+        #print(f"Testing jump for x = {x}")
+        #print(f"Row range : {list(row_range)}")
         for row in row_range:
+            #print(f"Empty cell in ({x},{row}) ? : {board[x][row]}")
             if board[x][row] == EMPTY_CELL:
+                #print("yes")
                 moves.add((x, row))
                 break
-    #print(f"Found {len(moves)} for direction {direction}")
+    #print(f"Found {len(moves)} for direction {direction} : {moves}")
     return moves
 
 def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: str) -> set[tuple[int,int]]:
@@ -261,14 +310,17 @@ def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
         moves.add((col, y))
 
     # If no move is possible, maybe jumping is possible
-    if len(moves) == 0:
+    if len(moves) == 0 and is_landlocked(board, coord):
+        #print(f"Testing jump for y = {y}")
+        #print(f"Row range : {list(col_range)}")
         # Find next empty cell
         # @TODO: combine with the previous loop ?
         for col in col_range:
+            #print(f"Empty cell in ({col},{y}) ? : {board[col][y]}")
             if board[col][y] == EMPTY_CELL:
                 moves.add((col, y))
                 break
-    #print(f"Found {len(moves)} for direction {direction}")
+    #print(f"Found {len(moves)} for direction {direction} : {moves}")
     return moves
 
 def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
@@ -288,7 +340,7 @@ def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
     all_moves = set()
 
     # If totem's row and column is full, it can move everywhere on the board
-    if is_landlocked(board, (totem_x, totem_y)):
+    if is_totem_fully_landlocked(board, (totem_x, totem_y)):
         return all_free_cells(board)
 
     # Add all moves in each direction, including cell's jump
@@ -297,7 +349,7 @@ def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
     all_moves.update(col_totem_moves(board, (totem_x, totem_y), 'up'))
     all_moves.update(col_totem_moves(board, (totem_x, totem_y), 'down'))
 
-    #print(f"There are {len(all_moves)} moves possibles.")
+    #print(f"There are {len(all_moves)} moves possibles : {all_moves}")
     return all_moves
 
 def move_totem(board: list[list[str]], totem: str, coord: tuple[int, int]) -> None:
@@ -327,6 +379,7 @@ def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[
         A list of possible moves as a set of tuple
     """
 
+    ic(totem_coord)
     accessible_positions=[]
     if(totem_coord[0]-1 >= 0 and board[totem_coord[0]-1][totem_coord[1]] == EMPTY_CELL):
         accessible_positions.append((totem_coord[0]-1, totem_coord[1]))

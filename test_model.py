@@ -7,7 +7,6 @@ import pytest
 from model import TotemException
 oxo = pytest.importorskip("model")
 
-
 class TestFunctionsExist:
     """Test if each mandatory function exists"""
 
@@ -62,7 +61,6 @@ class TestFunctionsExist:
     def test_is_winner(self):
         """Test if is_winner function exists"""
         assert hasattr(oxo.is_winner, "__call__")
-
 
 class TestReturnedType:
     """Test the correct typing of returned values"""
@@ -133,7 +131,6 @@ class TestReturnedType:
         board[3][3] = "T_O"
         assert isinstance(oxo.is_winner(board, "Bobby", (1,1)), bool)
 
-
 class TestPlayerNames:
     ''' Test player's name correctness'''
 
@@ -161,7 +158,6 @@ class TestPlayerNames:
         ''' Test if valid names are accepted'''
         assert oxo.valid_player_names("René", "Bob") is True
         assert oxo.valid_player_names("Daniel", "Vincent") is True
-
 
 class TestTokenDrops:
     ''' Test the move's possibilities of a pawn'''
@@ -391,7 +387,6 @@ class TestTotemMoves:
     def test_first_move_after_init(self):
         ''' Test that the whole row and line is allowed for a totem after the board init '''
         board = oxo.init_board()
-        print(oxo.str_board(board))
         moves = oxo.all_totem_moves(board, 'T_X')
         assert len(moves) == 10
 
@@ -401,8 +396,35 @@ class TestTotemMoves:
         board[2][3] = 'T_X'
         assert oxo.all_totem_moves(board, 'T_X') == set()
 
-    def test_totem_near_pawn_jump_right(self):
+    def test_totem_near_pawn_jump_right_down(self):
         ''' Test totem jumps '''
+        board = [
+            ['D_O', 'T_O', '   ', 'P_X', '   ', '   '],
+            ['D_O', 'D_O', '   ', '   ', '   ', '   '],
+            ['T_X', 'P_X', '   ', '   ', '   ', '   '],
+            ['D_X', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   ']
+        ]
+        expected_moves = {(2,2), (4,0)}
+        moves = oxo.all_totem_moves(board, 'T_X')
+        assert moves == expected_moves
+
+    def test_totem_near_pawn_jump_left_up(self):
+        ''' Test totem jumps '''
+        board = [
+            ['   ', 'T_O', '   ', 'P_X', '   ', '   '],
+            ['   ', 'D_O', '   ', '   ', 'D_O ', '   '],
+            ['   ', 'P_X', 'P_X', 'P_X', 'T_X', 'P_X'],
+            ['D_X', '   ', '   ', '   ', 'D_O', '   '],
+            ['   ', '   ', '   ', '   ', 'D_O', '   '],
+            ['   ', '   ', '   ', '   ', 'D_O', '   ']
+        ]
+        expected_moves = {(0, 4), (2,0)}
+        moves = oxo.all_totem_moves(board, 'T_X')
+        assert moves == expected_moves
+    
+    def test_some_moves(self):
         board = [
             ['T_X', '   ', '   ', 'P_X', '   ', '   '],
             ['   ', '   ', '   ', '   ', '   ', '   '],
@@ -419,6 +441,98 @@ class TestTotemMoves:
     def test_move_totem(self):
         ''' Test to move the totem '''
         #@TODO Daniel
+
+    def test_is_landlocked(self):
+        ''' Tests when the totem is surrounded '''
+        board = [
+            ['   ', 'T_O', '   ', 'P_X', '   ', '   '],
+            ['   ', 'D_O', '   ', '   ', 'D_O ', '   '],
+            ['   ', 'P_X', '   ', 'P_X', 'T_X', 'P_X'],
+            ['D_X', '   ', '   ', '   ', 'D_O', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', 'D_O', '   ']
+        ]
+        totem_coords = oxo.find_totem(board, 'T_X')
+        assert oxo.is_landlocked(board, totem_coords) is True
+
+        board = [
+            ['   ', 'T_O', '   ', 'P_X', 'D_O', 'D_O'],
+            ['   ', 'D_O', '   ', '   ', 'D_O', 'D_O'],
+            ['D_O', 'P_X', 'P_X', 'P_X', 'P_X', 'T_X'],
+            ['D_X', '   ', '   ', '   ', 'D_O', 'D_O'],
+            ['   ', '   ', '   ', '   ', 'D_O', 'D_O'],
+            ['   ', '   ', '   ', '   ', 'D_O', 'D_O']
+        ]
+        totem_coords = oxo.find_totem(board, 'T_X')
+        assert oxo.is_landlocked(board, totem_coords) is True
+
+        board = [
+            ['D_O', 'T_O', '   ', 'P_X', '   ', 'D_O'],
+            ['   ', 'D_O', '   ', '   ', '   ', 'D_O'],
+            ['T_O', 'P_X', 'P_X', 'P_X', '   ', 'P_X'],
+            ['D_X', '   ', '   ', '   ', 'D_O', 'D_O'],
+            ['D_O', '   ', '   ', '   ', 'D_O', 'D_O'],
+            ['D_O', '   ', '   ', '   ', 'D_O', 'D_O']
+        ]
+        totem_coords = oxo.find_totem(board, 'T_O')
+        assert oxo.is_landlocked(board, totem_coords) is False
+
+        board = [
+            ['D_O', 'T_O', '   ', 'P_X', '   ', 'D_O'],
+            ['   ', 'D_O', '   ', '   ', '   ', 'D_O'],
+            ['D_O', 'P_X', 'T_O', 'P_X', '   ', 'P_X'],
+            ['D_X', '   ', '   ', '   ', 'D_O', 'D_O'],
+            ['D_O', '   ', '   ', '   ', 'D_O', 'D_O'],
+            ['D_O', '   ', '   ', '   ', 'D_O', 'D_O']
+        ]
+        totem_coords = oxo.find_totem(board, 'T_O')
+        assert oxo.is_landlocked(board, totem_coords) is False
+
+    def test_is_totem_fully_landlocked(self):
+        ''' Tests when the totem is fully landlocked '''
+        board = [
+            ['   ', 'T_O', '   ', 'P_X', '   ', '   '],
+            ['   ', 'D_O', '   ', '   ', 'D_O ', '   '],
+            ['   ', 'P_X', 'P_X', 'P_X', 'T_X', 'P_X'],
+            ['D_X', '   ', '   ', '   ', 'D_O', '   '],
+            ['   ', '   ', '   ', '   ', 'D_O', '   '],
+            ['   ', '   ', '   ', '   ', 'D_O', '   ']
+        ]
+        totem_coords = oxo.find_totem(board, 'T_X')
+        assert oxo.is_totem_fully_landlocked(board, totem_coords) is False
+
+        board = [
+            ['   ', 'T_O', '   ', 'P_X', 'D_O', '   '],
+            ['   ', 'D_O', '   ', '   ', 'D_O ', '   '],
+            ['D_O', 'P_X', 'P_X', 'P_X', 'T_X', 'P_X'],
+            ['D_X', '   ', '   ', '   ', 'D_O', '   '],
+            ['   ', '   ', '   ', '   ', 'D_O', '   '],
+            ['   ', '   ', '   ', '   ', 'D_O', '   ']
+        ]
+        totem_coords = oxo.find_totem(board, 'T_X')
+        assert oxo.is_totem_fully_landlocked(board, totem_coords) is True
+
+        board = [
+            ['   ', 'T_O', '   ', 'P_X', 'D_O', 'D_O'],
+            ['   ', 'D_O', '   ', '   ', 'D_O', 'D_O'],
+            ['D_O', 'P_X', 'P_X', 'P_X', 'P_X', 'T_X'],
+            ['D_X', '   ', '   ', '   ', 'D_O', 'D_O'],
+            ['   ', '   ', '   ', '   ', 'D_O', 'D_O'],
+            ['   ', '   ', '   ', '   ', 'D_O', 'D_O']
+        ]
+        totem_coords = oxo.find_totem(board, 'T_X')
+        assert oxo.is_totem_fully_landlocked(board, totem_coords) is True
+
+        board = [
+            ['D_O', 'T_O', '   ', 'P_X', '   ', 'D_O'],
+            ['D_O', 'D_O', '   ', '   ', '   ', 'D_O'],
+            ['T_O', 'P_X', 'P_X', 'P_X', '   ', 'P_X'],
+            ['D_X', '   ', '   ', '   ', 'D_O', 'D_O'],
+            ['D_O', '   ', '   ', '   ', 'D_O', 'D_O'],
+            ['D_O', '   ', '   ', '   ', 'D_O', 'D_O']
+        ]
+        totem_coords = oxo.find_totem(board, 'T_O')
+        assert oxo.is_totem_fully_landlocked(board, totem_coords) is False
 
 class TestBoard:
     ''' Tests of the board'''

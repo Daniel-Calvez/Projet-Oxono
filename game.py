@@ -53,6 +53,7 @@ def main():
         if ia_game and active_player == player2:
             # Get the action from the IA, ask only 3 times
             ia_counter = 3
+            print(str_board_colored(board, active_player, opponent))
             while not valid_action and ia_counter > 0:
                 # One second to answer
                 start = time.time()
@@ -89,7 +90,6 @@ def main():
             log.write("\n")
 
         # Check if active player wins
-        print(is_winner(board, active_player, token_coord))
         if is_winner(board, active_player, token_coord):
             print(f"{active_player} gagne la partie! GG!")
             print(str_board_colored(board, player1, player2))

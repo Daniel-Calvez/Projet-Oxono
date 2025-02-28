@@ -7,6 +7,7 @@ Daniel Calvez & Vincent Ducot
 
 import random
 import model as model
+from icecream import ic
 
 def name():
     '''
@@ -35,8 +36,13 @@ def ask_play(board: list[list[str]], player: str, opponent: str) -> str:
     totems = ['T_O', 'T_X']
     totem = random.choice(totems)
     totem_coords = model.find_totem(board, totem)
-    totem_move = random.choice(list(model.all_totem_moves(board, totem)))
-    pawn_move = random.choice(list(model.all_token_drops(board, totem_coords)))
+    all_totem = model.all_totem_moves(board, totem)
+    ic(all_totem)
+    totem_move = random.choice(list(all_totem))
+    ic(totem_move)
+    all_drops = model.all_token_drops(board, totem_move)
+    ic(all_drops)
+    pawn_move = random.choice(list(all_drops))
     action = f"{totem[-1]}{model.reverse_convert_coord(totem_move)}{model.reverse_convert_coord(pawn_move)}"
     print(f"Action computed {action}")
     return action
