@@ -440,13 +440,45 @@ class TestTotemMoves:
 
     def test_move_totem(self):
         ''' Test to move the totem '''
-        #@TODO Daniel
+        board = [
+            ['   ', 'T_O', '   ', 'P_X', '   ', '   '],
+            ['   ', 'D_O', '   ', '   ', 'D_O ','   '],
+            ['   ', 'P_X', '   ', 'P_X', 'T_X', 'P_X'],
+            ['D_X', '   ', '   ', '   ', 'D_O', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', 'D_O', '   ']
+        ]
+        oxo.move_totem(board, "T_O", (1,2))
+        assert board[1][2]=="T_O"
+        assert board[0][1]=="   "
+
+        oxo.move_totem(board, "T_X", (5,0))
+        assert board[5][0]=="T_X"
+        assert board[2][4]=="   "
+
+
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', 'T_X', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', 'T_O', '   ', '   ', '   ', '   ']
+        ]
+        oxo.move_totem(board, "T_X", (4,1))
+        assert board[4][1]=="T_X"
+        assert board[1][4]=="   "
+
+        oxo.move_totem(board, "T_O", (1,5))
+        assert board[1][5]=="T_O"
+        assert board[5][1]=="   "
+
 
     def test_is_landlocked(self):
         ''' Tests when the totem is surrounded '''
         board = [
             ['   ', 'T_O', '   ', 'P_X', '   ', '   '],
-            ['   ', 'D_O', '   ', '   ', 'D_O ', '   '],
+            ['   ', 'D_O', '   ', '   ', 'D_O ','   '],
             ['   ', 'P_X', '   ', 'P_X', 'T_X', 'P_X'],
             ['D_X', '   ', '   ', '   ', 'D_O', '   '],
             ['   ', '   ', '   ', '   ', '   ', '   '],

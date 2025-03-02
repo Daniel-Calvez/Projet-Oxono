@@ -552,7 +552,7 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
     # This loops parse backward vertically, checking the symbol and color
     # and going the other way if there is no token, a different symbol and color or if out of bounds
     while vertical_pos<6:
-        if(vertical_pos<0 or not(is_color or is_symbol)):
+        if(vertical_pos<0 or (not(is_color or is_symbol) and offset <0)):
             vertical_pos=coord[0] +1
             offset = 1
         if(is_symbol and board[vertical_pos][coord[1]][2]== token[2] and token[0]!="T"):
@@ -568,7 +568,6 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
             return True
         if(not(is_color or is_symbol)and offset>0):
             break
-
         vertical_pos += offset
 
     symbol_score = 0
@@ -579,7 +578,7 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
     is_symbol = True
     # Same loop but horizontal
     while horizontal_pos<6:
-        if(horizontal_pos<0 or not(is_color or is_symbol)):
+        if(horizontal_pos<0 or  (not(is_color or is_symbol) and offset <0)):
             horizontal_pos=coord[1] +1
             offset = 1
         if(is_symbol and board[coord[0]][horizontal_pos][2]==token[2] and token[0]!="T"):
