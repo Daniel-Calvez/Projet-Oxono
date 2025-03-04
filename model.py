@@ -495,6 +495,9 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
     token_drops = all_token_drops(board, totem_coord)
     token_coord = convert_coord(action[3:5])
 
+    if is_landlocked(board, totem_coord):
+        token_drops = all_free_cells(board)
+
     if abs(curr_coord_totem[0] - totem_coord[0] + curr_coord_totem[1] - totem_coord[1]) == 1:
         token_drops.add(curr_coord_totem)
 
@@ -555,6 +558,8 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
         if(vertical_pos<0 or (not(is_color or is_symbol) and offset <0)):
             vertical_pos=coord[0] +1
             offset = 1
+            is_color = True
+            is_symbol = True
         if(is_symbol and board[vertical_pos][coord[1]][2]== token[2] and token[0]!="T"):
             symbol_score +=1
         else:
@@ -581,6 +586,8 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
         if(horizontal_pos<0 or  (not(is_color or is_symbol) and offset <0)):
             horizontal_pos=coord[1] +1
             offset = 1
+            is_color = True
+            is_symbol = True
         if(is_symbol and board[coord[0]][horizontal_pos][2]==token[2] and token[0]!="T"):
             symbol_score +=1
         else:
