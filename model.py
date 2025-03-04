@@ -6,12 +6,12 @@ Daniel Calvez & Vincent Ducot
 '''
 
 import random as rd
-#from icecream import ic
+from icecream import ic
 from colorama import Fore, Style
 
 EMPTY_CELL = '   '
 PINK_PLAYER = ""
-#ic.configureOutput(includeContext=True)
+ic.configureOutput(includeContext=True)
 
 class TotemException(Exception):
     '''
@@ -226,7 +226,7 @@ def all_free_cells(board: list[list[str]]) -> set[tuple[int,int]]:
     Raise
         No exception
     '''
-    cells = [board[row][col] for row in range(len(board)) \
+    cells = [(row,col) for row in range(len(board)) \
              for col in range(len(board[row])) if board[row][col] == EMPTY_CELL]
     return set(cells)
 
@@ -389,6 +389,7 @@ def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[
         accessible_positions.append((totem_coord[0], totem_coord[1]-1))
     if(totem_coord[1]+1 < len(board[0]) and board[totem_coord[0]][totem_coord[1]+1] == EMPTY_CELL):
         accessible_positions.append((totem_coord[0], totem_coord[1]+1))
+
     return set(accessible_positions)
 
 def valid_player_names(player1: str, player2:str) -> bool:
@@ -488,21 +489,25 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
     totem_moves = all_totem_moves(board, totem)
     totem_coord = convert_coord(action[1:3])
     curr_coord_totem = find_totem(board,totem)
+    #print(totem_moves)
     if totem_coord not in totem_moves:
         print("Totem move impossible")
         return False
 
     token_drops = all_token_drops(board, totem_coord)
+    #ic(token_drops)
     token_coord = convert_coord(action[3:5])
 
     if is_landlocked(board, totem_coord):
         token_drops = all_free_cells(board)
-        token_drops.remove(totem_coord)
-        token_drops.append(curr_coord_totem)
-
-    if abs(curr_coord_totem[0] - totem_coord[0] + curr_coord_totem[1] - totem_coord[1]) == 1:
+        #ic(token_drops)
+        token_drops.discard(totem_coord)
         token_drops.add(curr_coord_totem)
 
+    elif abs(curr_coord_totem[0] - totem_coord[0] + curr_coord_totem[1] - totem_coord[1]) == 1:
+        token_drops.add(curr_coord_totem)
+
+    #ic(token_drops)
     if token_coord not in token_drops:
         print("Token move impossible")
         return False

@@ -19,7 +19,7 @@ def name():
     Exception
         No exception
     '''
-    return "DeepTic"
+    return "XonoX"
 
 def ask_play(board: list[list[str]], player: str, opponent: str) -> str:
     '''
