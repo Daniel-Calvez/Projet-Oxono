@@ -6,12 +6,12 @@ Daniel Calvez & Vincent Ducot
 '''
 
 import random as rd
-from icecream import ic
+#from icecream import ic
 from colorama import Fore, Style
 
 EMPTY_CELL = '   '
 PINK_PLAYER = ""
-ic.configureOutput(includeContext=True)
+#ic.configureOutput(includeContext=True)
 
 class TotemException(Exception):
     '''
@@ -379,7 +379,7 @@ def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[
         A list of possible moves as a set of tuple
     """
 
-    ic(totem_coord)
+    #ic(totem_coord)
     accessible_positions=[]
     if(totem_coord[0]-1 >= 0 and board[totem_coord[0]-1][totem_coord[1]] == EMPTY_CELL):
         accessible_positions.append((totem_coord[0]-1, totem_coord[1]))

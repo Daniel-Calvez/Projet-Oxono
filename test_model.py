@@ -182,6 +182,22 @@ class TestTokenDrops:
         board[0][0] = 'T_X'
         assert len(oxo.all_token_drops(board, (0,0))) == 2
 
+    def test_totem_landlocked(self):
+        ''' Test when totem just move in a landlocked case '''
+        board = [
+            ['   ', 'J_O', '   ', '   ', '   ', '   '],
+            ['   ', 'J_X', 'J_O', 'J_O', '   ', 'P_X'],
+            ['   ', 'P_X', 'J_X', 'P_X', 'T_O', 'P_X'],
+            ['   ', 'P_X', 'T_X', 'J_O', 'J_O', 'J_O'],
+            ['   ', 'J_O', 'J_O', 'P_X', 'P_X', 'J_O'],
+            ['   ', 'J_O', '   ', 'P_X', 'P_X', 'J_O']
+        ]
+        t_x = oxo.find_totem(board, 'T_X')
+        assert oxo.all_token_drops(board, t_x) == {(0,0), (1,0), (2,0), (3,0), (4,0), (5,0)
+            (0,2), (0,3), (0,4), (0,5), 
+            (1,4), (5, 2)}
+
+
     def test_classic_cases(self):
         ''' Test normal cases '''
         board = [
@@ -630,6 +646,17 @@ class TestEndGame:
         assert oxo.is_winner(board, "Alphonse", (3,1)) is True
         assert oxo.is_winner(board, "Alphonse", (3,2)) is True
         assert oxo.is_winner(board, "Alphonse", (3,3)) is True
+
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', '   ', '   ', '   ', '   '],
+            ['   ', 'T_X', 'A_X', 'B_X', 'T_O', '   '],
+            ['A_O', '   ', 'A_X', 'A_O', 'B_O', '   '],
+            ['   ', 'B_X', 'A_O', '   ', '   ', '   '],
+            ['   ', '   ', 'A_X', '   ', '   ', '   ']
+        ]
+        assert oxo.is_winner(board, "Alphonse", (4,2)) is True
+
 
     def test_symbol_winning(self):
         ''' A wins with 4 symbols'''
