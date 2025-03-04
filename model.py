@@ -497,6 +497,8 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
 
     if is_landlocked(board, totem_coord):
         token_drops = all_free_cells(board)
+        token_drops.remove(totem_coord)
+        token_drops.append(curr_coord_totem)
 
     if abs(curr_coord_totem[0] - totem_coord[0] + curr_coord_totem[1] - totem_coord[1]) == 1:
         token_drops.add(curr_coord_totem)
