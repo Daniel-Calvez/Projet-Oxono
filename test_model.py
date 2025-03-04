@@ -689,3 +689,23 @@ class TestEndGame:
         assert oxo.is_winner(board, "Alphonse", (3,2)) is True
         assert oxo.is_winner(board, "Alphonse", (3,3)) is True
         assert oxo.is_winner(board, "Brigitte", (2,5)) is True
+
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', 'B_X'],
+            ['   ', '   ', '   ', '   ', '   ', 'B_X'],
+            ['   ', 'T_X', 'A_X', 'B_X', 'T_O', 'B_O'],
+            ['   ', '   ', '   ', '   ', 'B_O', 'B_O'],
+            ['   ', 'B_X', 'B_O', 'B_O', '   ', '   '],
+            ['A_X', 'A_X', 'A_X', 'A_X', '   ', '   ']
+        ]
+        assert oxo.is_winner(board, "Alphonse", (5,0)) is True
+
+        board = [
+            ['   ', '   ', '   ', '   ', '   ', 'B_X'],
+            ['   ', '   ', '   ', '   ', '   ', 'B_X'],
+            ['   ', 'T_X', 'A_X', 'B_X', 'T_O', 'B_O'],
+            ['   ', '   ', '   ', '   ', 'B_O', 'B_O'],
+            ['   ', 'B_X', 'B_O', 'B_O', '   ', '   '],
+            ['   ', '   ', 'A_X', 'A_X', 'A_X', 'A_X']
+        ]
+        assert oxo.is_winner(board, "Alphonse", (5,5)) is True
