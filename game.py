@@ -13,7 +13,9 @@ from model import *
 import ia as ia
 
 
-USAGE = "Usage : python game.py <player1> [<player2> | ia]"
+USAGE = "Usage : python game.py [<player1> | ia] [<player2> | ia] \n \
+        player 1 can play against IA by choosing 'ia' as player2. \n \
+        An IA vs IA match is possible by choosing 'ia' for each player."
 
 def main():
     if len(sys.argv) < 3:
@@ -73,6 +75,7 @@ def main():
             if ia_counter == 0:
                 print(f"IA {player2} n'a pas répondu en 3 essais, disqualifiée!")
                 sys.exit(0)
+        # When IA is also player 1
         elif ia_vs_ia and active_player == player1:
             # Get the action from the IA, ask only 3 times
             ia_counter = 3
