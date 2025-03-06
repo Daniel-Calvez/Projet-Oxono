@@ -60,7 +60,7 @@ def str_board(board: list[list[str]]) -> str:
     Raise
         No exception
     '''
-    displayed_board = "    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮"
+    displayed_board = "    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮\n"
     for i in range(len(board)):
         displayed_board += f"{i+1} "+''.join([str(f"│{cell}") for cell in board[i]])+"│\n"
         if i < 5:
@@ -80,7 +80,7 @@ def str_board_colored(board: list[list[str]], player1: str, player2: str) -> str
     Raise
         No exception
     '''
-    displayed_board = "    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮"
+    displayed_board = "    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮\n"
     for i, line in enumerate(board):
         displayed_board += f"{i+1} "
         for cell in line:

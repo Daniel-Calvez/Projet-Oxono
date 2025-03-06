@@ -593,6 +593,26 @@ class TestBoard:
             assert t_x[0] + t_o[0] == 5
             assert t_x[1] + t_o[1] == 5
 
+#     def test_str_board(self):
+#         expected_board = "    A   B   C   D   E   F \n\
+#   ╭───┬───┬───┬───┬───┬───╮\n \
+# 1 |   |   |   |   |   |   │\n \
+#   ├───┼───┼───┼───┼───┼───┤\n\
+# 2 |   |   |   |   |   |   │\n \
+#   ├───┼───┼───┼───┼───┼───┤\n \
+# 3 |   |   |T_X|   |   |   │\n \
+#   ├───┼───┼───┼───┼───┼───┤\n \
+# 4 |   |   |   |T_O|   |   │\n \
+#   ├───┼───┼───┼───┼───┼───┤\n \
+# 5 |   |   |   |   |   |   │\n \
+#   ├───┼───┼───┼───┼───┼───┤\n \
+# 6 |   |   |   |   |   |   │\n \
+#   ╰───┴───┴───┴───┴───┴───╯"
+#         board = oxo.init_board()
+#         oxo.move_totem(board, 'T_X', (2,2))
+#         oxo.move_totem(board, 'T_O', (3,3))
+#         assert oxo.str_board(board) == expected_board
+
     def test_nb_token(self):
         ''' Count the tokens '''
         board = [
