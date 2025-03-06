@@ -182,26 +182,6 @@ class TestTokenDrops:
         board[0][0] = 'T_X'
         assert len(oxo.all_token_drops(board, (0,0))) == 2
 
-    # def test_totem_landlocked(self):
-    #     ''' Test when totem just move in a landlocked case '''
-    #     board = [
-    #         ['   ', 'J_O', '   ', '   ', '   ', '   '],
-    #         ['   ', 'J_X', 'J_O', 'J_O', '   ', 'P_X'],
-    #         ['   ', 'P_X', 'J_X', 'P_X', 'T_O', 'P_X'],
-    #         ['   ', 'P_X', 'T_X', 'J_O', 'J_O', 'J_O'],
-    #         ['   ', 'J_O', 'J_O', 'P_X', 'P_X', 'J_O'],
-    #         ['   ', 'J_O', '   ', 'P_X', 'P_X', 'J_O']
-    #     ]
-    #     t_x = oxo.find_totem(board, 'T_X')
-    #     expected_moves = {(0,0), (1,0), (2,0), (3,0), (4,0), (5,0),
-    #         (0,2), (0,3), (0,4), (0,5), 
-    #         (1,4), (5, 2)}
-    #     moves = oxo.all_token_drops(board, t_x)
-    #     print(len(moves))
-    #     print(moves)
-    #     assert moves == expected_moves
-
-
     def test_classic_cases(self):
         ''' Test normal cases '''
         board = [
@@ -503,7 +483,6 @@ class TestTotemMoves:
         assert board[1][5]=="T_O"
         assert board[5][1]=="   "
 
-
     def test_is_landlocked(self):
         ''' Tests when the totem is surrounded '''
         board = [
@@ -599,6 +578,21 @@ class TestTotemMoves:
 class TestBoard:
     ''' Tests of the board'''
 
+    def test_init_board(self):
+        ''' Test the board's initialization '''
+        # Test the size
+        board = oxo.init_board()
+        assert len(board) == 6 and len(board[0]) == 6
+
+        # Test the totems positions, a lot of times as it's random
+        for i in range(0,1000):
+            t_x = oxo.find_totem(board, 'T_X')
+            assert t_x in [(2,3),(3,2),(2,2),(3,3)]
+            t_o = oxo.find_totem(board, 'T_O')
+            assert t_o in [(2,3),(3,2),(2,2),(3,3)]
+            assert t_x[0] + t_o[0] == 5
+            assert t_x[1] + t_o[1] == 5
+
     def test_nb_token(self):
         ''' Count the tokens '''
         board = [
@@ -640,6 +634,21 @@ class TestBoard:
         monkeypatch.setattr("sys.stdin", StringIO(f"{action}\n"))
         oxo.set_player1("Player1")
         assert oxo.ask_play(board, "Player1", "Alice") == action
+
+    def test_all_free_cells(self):
+        ''' Test all free cells are correctly detected '''
+        board = [
+            ['   ', '   ', 'A_O', 'A_O', '   ', 'B_X'],
+            ['   ', 'A_O', '   ', 'A_O', '   ', 'B_X'],
+            ['   ', 'T_X', 'A_X', 'B_X', 'T_O', 'B_O'],
+            ['A_X', 'A_X', 'A_X', 'A_X', 'B_O', 'B_O'],
+            ['   ', 'B_X', 'B_O', 'B_O', '   ', '   '],
+            ['   ', '   ', 'A_O', 'A_X', '   ', '   ']
+        ]
+        expected_cells = {(0,0), (0,1), (0,4), (1,0), (1,2), (1,4), (2,0),
+                          (4,0), (4,4), (4,5), (5,0), (5,1), (5,4), (5,5)}
+        free_cells = oxo.all_free_cells(board)
+        assert expected_cells == free_cells
 
 class TestEndGame:
     ''' Tests for winning or draw '''

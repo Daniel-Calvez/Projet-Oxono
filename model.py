@@ -60,9 +60,9 @@ def str_board(board: list[list[str]]) -> str:
     Raise
         No exception
     '''
-    displayed_board = "\n    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮\n"
+    displayed_board = "    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮"
     for i in range(len(board)):
-        displayed_board += f"{i+1} "+''.join([str(f"|{cell}") for cell in board[i]])+"|\n"
+        displayed_board += f"{i+1} "+''.join([str(f"│{cell}") for cell in board[i]])+"│\n"
         if i < 5:
             displayed_board += "  ├───┼───┼───┼───┼───┼───┤\n"
     displayed_board += "  ╰───┴───┴───┴───┴───┴───╯"
@@ -80,7 +80,7 @@ def str_board_colored(board: list[list[str]], player1: str, player2: str) -> str
     Raise
         No exception
     '''
-    displayed_board = "\n    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮\n"
+    displayed_board = "    A   B   C   D   E   F\n  ╭───┬───┬───┬───┬───┬───╮"
     for i, line in enumerate(board):
         displayed_board += f"{i+1} "
         for cell in line:
@@ -92,7 +92,7 @@ def str_board_colored(board: list[list[str]], player1: str, player2: str) -> str
             else:
                 color_cell = Fore.GREEN + cell + Style.RESET_ALL
             displayed_board += f"|{color_cell}"
-        displayed_board += "|\n"
+        displayed_board += "│\n"
         if i < 5:
             displayed_board += "  ├───┼───┼───┼───┼───┼───┤\n"
     displayed_board += "  ╰───┴───┴───┴───┴───┴───╯"
@@ -473,16 +473,16 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
         No exception
     '''
     if not is_action(action):
-        print("Not an action")
+        #print("Not an action")
         return False
     if action[0] == "X":
         if nb_token(board, player[0]+"_X") <= 0:
-            print("No token left")
+            #print("No token left")
             return False
         totem = "T_X"
     else:
         if nb_token(board, player[0]+"_O") <= 0:
-            print("No token left")
+            #print("No token left")
             return False
         totem = "T_O"
 
@@ -491,7 +491,7 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
     curr_coord_totem = find_totem(board,totem)
     #print(totem_moves)
     if totem_coord not in totem_moves:
-        print("Totem move impossible")
+        #print("Totem move impossible")
         return False
 
     token_drops = all_token_drops(board, totem_coord)
@@ -509,7 +509,7 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
 
     #ic(token_drops)
     if token_coord not in token_drops:
-        print("Token move impossible")
+        #print("Token move impossible")
         return False
     return True
 
@@ -532,7 +532,7 @@ def ask_play(board: list[list[str]], player: str, opponent: str) -> str:
     while not valid_action:
         action = input(f"Vous êtes {player}, quelle action souhaitez-vous faire ? ")
         valid_action = is_valid_action(board, action, player)
-        print(f"Is {action} a valid action ? {valid_action}")
+        #print(f"Is {action} a valid action ? {valid_action}")
 
     return action
 
