@@ -23,11 +23,17 @@ def main():
     player1 = sys.argv[1]
     player2 = sys.argv[2]
 
-    ia_game = False
+    player_vs_ia = False
+    ia_vs_ia = False
     if player2 == 'ia':
         print(f"Le 2e joueur est une IA appelée {ia.name()}")
         player2 = ia.name()
-        ia_game = True
+        player_vs_ia = True
+
+        if player1 == 'ia':
+            print(f"Le 1er joueur est une IA appelée PlayerOne")
+            player1 = "PlayerOne"
+            ia_vs_ia = True
 
 
     if not valid_player_names(player1, player2):
@@ -50,7 +56,7 @@ def main():
     while True:
         valid_action = False
         action = ""
-        if ia_game and active_player == player2:
+        if (player_vs_ia or ia_vs_ia) and active_player == player2:
             # Get the action from the IA, ask only 3 times
             ia_counter = 3
             print(str_board_colored(board, active_player, opponent))
@@ -67,6 +73,24 @@ def main():
             if ia_counter == 0:
                 print(f"IA {player2} n'a pas répondu en 3 essais, disqualifiée!")
                 sys.exit(0)
+        elif ia_vs_ia and active_player == player1:
+            # Get the action from the IA, ask only 3 times
+            ia_counter = 3
+            print(str_board_colored(board, active_player, opponent))
+            while not valid_action and ia_counter > 0:
+                # One second to answer
+                start = time.time()
+                action = ia.ask_play(board, active_player, opponent)
+                end = time.time()
+                if end - start > 1:
+                    print(f"IA {player1} a été trop longue à répondre, disqualifiée!")
+                    sys.exit(0)
+                valid_action = is_valid_action(board, action, active_player)
+                ia_counter -= 1
+            if ia_counter == 0:
+                print(f"IA {player2} n'a pas répondu en 3 essais, disqualifiée!")
+                sys.exit(0)
+            
         else:
             # Get the action from the player
             action = ask_play(board, active_player, opponent)
