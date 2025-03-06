@@ -240,6 +240,21 @@ class TestTokenDrops:
         assert (3,4) in drops
         assert (4,3) in drops
 
+    def test_half_landlocked(self):
+        board = [
+            ['P_X', '   ', 'P_O', '   ', 'P_O', '   '],
+            ['X_X', 'T_X', 'P_O', 'T_O', '   ', '   '],
+            ['   ', 'X_X', '   ', '   ', 'X_O', '   '],
+            ['   ', '   ', '   ', 'P_O', '   ', 'P_O'],
+            ['X_X', '   ', '   ', '   ', '   ', '   '],
+            ['   ', '   ', 'X_X', '   ', 'X_X', '   ']
+        ]
+        t_x = oxo.find_totem(board, 'T_X')
+        drops = oxo.all_token_drops(board, (0,1))
+        print(drops)
+        assert len(drops) != 0
+
+
 class TestConvertCoord:
     ''' Test convert coord from human instruction to matrix coord'''
     def test_convert_coord_incorrect(self):
