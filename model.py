@@ -573,7 +573,7 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
         else:
             is_symbol = False
 
-        if(is_color and board[vertical_pos][coord[1]][0] == token[0]):
+        if(is_color and board[vertical_pos][coord[1]][0] == token[0] and token[0]!="T"):
             color_score += 1
         else:
             is_color=False
@@ -602,7 +602,7 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
         else:
             is_symbol = False
 
-        if(is_color and board[coord[0]][horizontal_pos][0] == token[0]):
+        if(is_color and board[coord[0]][horizontal_pos][0] == token[0] and token[0]!="T"):
             color_score += 1
         else:
             is_color=False
