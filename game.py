@@ -9,6 +9,8 @@ import sys
 import datetime
 import os
 import time
+import argparse
+import textwrap
 from model import *
 import ia as ia
 
@@ -17,26 +19,56 @@ USAGE = "Usage : python game.py [<player1> | ia] [<player2> | ia] \n \
         player 1 can play against IA by choosing 'ia' as player2. \n \
         An IA vs IA match is possible by choosing 'ia' for each player."
 
-def main():
-    if len(sys.argv) < 3:
-        print(USAGE)
-        sys.exit(1)
+def ia_play(board, active_player, opponent, ia_level):
+    valid_action = False
+    action = ""
+    # Get the action from the IA, ask only 3 times
+    ia_counter = 3
+    print(str_board_colored(board, active_player, opponent))
+    while not valid_action and ia_counter > 0:
+        # One second to answer
+        start = time.time()
+        action = ia.ask_play(board, active_player, opponent, ia_level)
+        end = time.time()
+        if end - start > 1:
+            print(f"IA {active_player} a été trop longue à répondre, disqualifiée!")
+            sys.exit(0)
+        valid_action = is_valid_action(board, action, active_player)
+        ia_counter -= 1
+    if ia_counter == 0:
+        print(f"IA {active_player} n'a pas répondu en 3 essais, disqualifiée!")
+        sys.exit(0)
 
-    player1 = sys.argv[1]
-    player2 = sys.argv[2]
+    return action
+
+
+def main(args):
+    # if len(sys.argv) < 3:
+    #     print(USAGE)
+    #     sys.exit(1)
+
+    # player1 = sys.argv[1]
+    # player2 = sys.argv[2]
 
     player_vs_ia = False
     ia_vs_ia = False
-    if player2 == 'ia':
+
+    player1 = args.player1
+    player2 = args.player2
+
+    # Check if there are IA
+    if args.player1_ia:
+        if args.player2_ia:
+            print(f"Le 1er joueur est une IA appelée {player1}")
+            ia_vs_ia = True
+        else:
+            print("Le 1er joueur ne peut pas être une IA si le second joueur n'est pas une IA.")
+            sys.exit(1)
+
+    if args.player2_ia:
         print(f"Le 2e joueur est une IA appelée {ia.name()}")
         player2 = ia.name()
         player_vs_ia = True
-
-        if player1 == 'ia':
-            print(f"Le 1er joueur est une IA appelée PlayerOne")
-            player1 = "PlayerOne"
-            ia_vs_ia = True
-
 
     if not valid_player_names(player1, player2):
         print("Les noms des joueurs ne sont pas valides")
@@ -56,46 +88,14 @@ def main():
 
     # Main loop
     while True:
-        valid_action = False
-        action = ""
-        if (player_vs_ia or ia_vs_ia) and active_player == player2:
-            # Get the action from the IA, ask only 3 times
-            ia_counter = 3
-            print(str_board_colored(board, active_player, opponent))
-            while not valid_action and ia_counter > 0:
-                # One second to answer
-                start = time.time()
-                action = ia.ask_play(board, active_player, opponent)
-                end = time.time()
-                if end - start > 1:
-                    print(f"IA {player2} a été trop longue à répondre, disqualifiée!")
-                    sys.exit(0)
-                valid_action = is_valid_action(board, action, active_player)
-                ia_counter -= 1
-            if ia_counter == 0:
-                print(f"IA {player2} n'a pas répondu en 3 essais, disqualifiée!")
-                sys.exit(0)
-        # When IA is also player 1
-        elif ia_vs_ia and active_player == player1:
-            # Get the action from the IA, ask only 3 times
-            ia_counter = 3
-            print(str_board_colored(board, active_player, opponent))
-            while not valid_action and ia_counter > 0:
-                # One second to answer
-                start = time.time()
-                action = ia.ask_play(board, active_player, opponent)
-                end = time.time()
-                if end - start > 1:
-                    print(f"IA {player1} a été trop longue à répondre, disqualifiée!")
-                    sys.exit(0)
-                valid_action = is_valid_action(board, action, active_player)
-                ia_counter -= 1
-            if ia_counter == 0:
-                print(f"IA {player2} n'a pas répondu en 3 essais, disqualifiée!")
-                sys.exit(0)
-            
+        # Get action from IA
+        if (player_vs_ia and active_player == player2) or ia_vs_ia:
+            if active_player == player1:
+                action = ia_play(board, active_player, opponent, args.ia1_level)
+            else:
+                action = ia_play(board, active_player, opponent, args.ia2_level)
+        # Get the action from the player
         else:
-            # Get the action from the player
             action = ask_play(board, active_player, opponent)
 
         # Split the action string
@@ -132,4 +132,28 @@ def main():
             active_player, opponent = opponent, active_player
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+                    prog='python game.py',
+                    formatter_class=argparse.RawDescriptionHelpFormatter,
+                    description=textwrap.dedent('''\
+                            OXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXO
+                            X               Oxono               X
+                            O   Daniel Calvez & Vincent Ducot   O
+                            X   M1 Bio-Info - 2025              X
+                            OXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXO'''))
+    
+    parser.add_argument('player1', help='Nom du 1er joueur (ou IA)')
+    parser.add_argument('player2', help='Nom du 2e joueur. Si le second joueur est une IA, elle sera nommée automatiquement.')
+
+    parser.add_argument('--player1-ia', action='store_true', default=False,
+                        help='Si le 1er joueur est une IA.')
+    parser.add_argument('--player2-ia', action='store_true', default=False,
+                        help='Si le 2e joueur est une IA.')
+
+    parser.add_argument('--ia1-level', default=0, 
+                        choices = [0,1,2], help='Niveau de la 1ère IA : 0 (random), 1 (random++), 2 (minimax)')
+    parser.add_argument('--ia2-level', default=0, 
+                        choices = [0,1,2], help='Niveau de la 2e IA : 0 (random), 1 (random++), 2 (minimax)')
+    args = parser.parse_args()
+    print(args)
+    main(args)
