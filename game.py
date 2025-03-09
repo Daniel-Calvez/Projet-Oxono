@@ -151,9 +151,9 @@ if __name__ == '__main__':
                         help='Si le 2e joueur est une IA.')
 
     parser.add_argument('--ia1-level', default=0, 
-                        choices = [0,1,2], help='Niveau de la 1ère IA : 0 (random), 1 (random++), 2 (minimax)')
+                        choices = [0,1,2], type=int, help='Niveau de la 1ère IA : 0 (random), 1 (random++), 2 (minimax)')
     parser.add_argument('--ia2-level', default=0, 
-                        choices = [0,1,2], help='Niveau de la 2e IA : 0 (random), 1 (random++), 2 (minimax)')
+                        choices = [0,1,2], type=int, help='Niveau de la 2e IA : 0 (random), 1 (random++), 2 (minimax)')
     args = parser.parse_args()
     print(args)
     main(args)
