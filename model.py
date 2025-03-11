@@ -561,23 +561,29 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
     # This loops parse backward vertically, checking the symbol and color
     # and going the other way if there is no token, a different symbol and color or if out of bounds
     while vertical_pos<len(board):
+        # Goes forward from the start if the loop is out of bounds oor if both chains stopped while parsing backward
         if(vertical_pos<0 or (not(is_color or is_symbol) and offset <0)):
             vertical_pos=coord[0] +1
             offset = 1
             is_color = True
             is_symbol = True
             continue
+        # If the symbol chain is on and the symbol is right, extends the chain, else stops it
         if(is_symbol and board[vertical_pos][coord[1]][2]== token[2] and board[vertical_pos][coord[1]][0]!="T"):
             symbol_score +=1
         else:
             is_symbol = False
 
+        # If the color chain is on and the symbol is right, extends the chain, else stops it
         if(is_color and board[vertical_pos][coord[1]][0] == token[0] and board[vertical_pos][coord[1]][0]!="T"):
             color_score += 1
         else:
             is_color=False
-        if(symbol_score==4 or color_score==4):
+
+        # If at least one of the chains reached 4 return true
+        if(symbol_score>=4 or color_score>=4):
             return True
+        # Stops if the loop if both chains stopped while parsing forward
         if(not(is_color or is_symbol)and offset>0):
             break
         vertical_pos += offset
@@ -590,24 +596,32 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
     is_symbol = True
     # Same loop but horizontal
     while horizontal_pos<len(board):
+        # Goes forward from the start if the loop is out of bounds oor if both chains stopped while parsing backward
         if(horizontal_pos<0 or  (not(is_color or is_symbol) and offset <0)):
             horizontal_pos=coord[1] +1
             offset = 1
             is_color = True
             is_symbol = True
             continue
+        
+        # If the symbol chain is on and the symbol is right, extends the chain, else stops it
         if(is_symbol and board[coord[0]][horizontal_pos][2]==token[2] and board[coord[0]][horizontal_pos][0]!="T"):
             symbol_score +=1
         else:
             is_symbol = False
 
+        # If the color chain is on and the symbol is right, extends the chain, else stops it
         if(is_color and board[coord[0]][horizontal_pos][0] == token[0] and board[coord[0]][horizontal_pos][0]!="T"):
             color_score += 1
         else:
-            is_color=False
+            is_color=False        
+        
+        # If at least one of the chains reached 4 return true
         if(symbol_score==4 or color_score==4):
             return True
+        # Stops if the loop if both chains stopped while parsing forward
         if(not(is_color or is_symbol)and offset>0):
             break
         horizontal_pos += offset
     return False
+    
