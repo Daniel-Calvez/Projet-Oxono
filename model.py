@@ -8,6 +8,7 @@ Daniel Calvez & Vincent Ducot
 import random as rd
 from icecream import ic
 from colorama import Fore, Style
+from copy import deepcopy
 
 EMPTY_CELL = '   '
 PINK_PLAYER = ""
@@ -390,6 +391,9 @@ def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[
     if(totem_coord[1]+1 < len(board[0]) and board[totem_coord[0]][totem_coord[1]+1] == EMPTY_CELL):
         accessible_positions.append((totem_coord[0], totem_coord[1]+1))
 
+    if is_landlocked(board, totem_coord):
+        accessible_positions= all_free_cells(board)
+    
     return set(accessible_positions)
 
 def valid_player_names(player1: str, player2:str) -> bool:
@@ -494,18 +498,13 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
         #print("Totem move impossible")
         return False
 
-    token_drops = all_token_drops(board, totem_coord)
+
+    board_copy = deepcopy(board)
+    move_totem(board_copy, totem, totem_coord)
+
+    token_drops = all_token_drops(board_copy, totem_coord)
     #ic(token_drops)
     token_coord = convert_coord(action[3:5])
-
-    if is_landlocked(board, totem_coord):
-        token_drops = all_free_cells(board)
-        #ic(token_drops)
-        token_drops.discard(totem_coord)
-        token_drops.add(curr_coord_totem)
-
-    elif abs(curr_coord_totem[0] - totem_coord[0] + curr_coord_totem[1] - totem_coord[1]) == 1:
-        token_drops.add(curr_coord_totem)
 
     #ic(token_drops)
     if token_coord not in token_drops:
@@ -611,5 +610,4 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
         if(not(is_color or is_symbol)and offset>0):
             break
         horizontal_pos += offset
-        print(token[0])
     return False

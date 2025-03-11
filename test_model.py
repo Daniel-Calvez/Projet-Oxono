@@ -215,7 +215,7 @@ class TestTokenDrops:
             ['   ', '   ', '   ', '   ', '   ', '   ']
         ]
         t_x = oxo.find_totem(board, 'T_X')
-        assert len(oxo.all_token_drops(board, t_x)) == 0
+        assert len(oxo.all_token_drops(board, t_x)) == 27
 
         board = [
             ['   ', '   ', '   ', '   ', '   ', '   '],
