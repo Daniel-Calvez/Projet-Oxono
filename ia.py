@@ -19,7 +19,7 @@ def name() -> str:
     Exception
         No exception
     '''
-    return "XonoX"
+    return "XonoX_sous_bbl"
 
 def all_pawn_moves(board: list[list[str]], totem_move: tuple[int,int], totem: str) -> set[tuple[int,int]]:
     '''

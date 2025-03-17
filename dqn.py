@@ -1,6 +1,41 @@
+'''
+Oxono game's IA based on Deep-Q-Learning network
+M1 Bio-info project
+Daniel Calvez & Vincent Ducot
+2025
+'''
 
-def convert_board():
-    return
+import random
+import model as model
+import numpy as np
+from icecream import ic
+
+def convert_board(board, player1, player2, active_player) -> np.array:
+    tensor = np.zeros((6,6,7), dtype=np.int8)
+
+    for row in board:
+        for col in board[row]:
+            cell_content = board[row][col].strip()
+            prefix_p1 = player1[0:1]
+            prefix_p2 = player2[0:1]
+            if cell_content == prefix_p1+"X":  # X du joueur 1
+                tensor[row, col, 0] = 1
+            elif cell_content == prefix_p1+"O":  # O du joueur 1
+                tensor[row, col, 1] = 1
+            elif cell_content == prefix_p2+"X":  # X du joueur 2
+                tensor[row, col, 2] = 1
+            elif cell_content == prefix_p2+"O":  # O du joueur 2
+                tensor[row, col, 3] = 1
+            elif cell_content == "T_X":  # Totem X
+                tensor[row, col, 4] = 1
+            elif cell_content == "T_O":  # Totem O
+                tensor[row, col, 5] = 1
+            
+            if active_player == player1:
+                tensor[row, col, 6] = 0
+            else:
+                tensor[row, col, 6] = 1
+    return tensor
 
 def read_CNN():
     return
