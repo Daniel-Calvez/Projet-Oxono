@@ -5,6 +5,13 @@ Daniel Calvez & Vincent Ducot
 2025
 '''
 
+from torch import flatten
+from torch.nn import Module
+from torch.nn import Conv2d
+from torch.nn import Linear
+from torch.nn import MaxPool2d
+from torch.nn import ReLU
+from torch.nn import LogSoftmax
 import random
 import model as model
 import numpy as np
@@ -43,9 +50,10 @@ def read_CNN():
 def write_CNN():
     return
 
-def cnn():
-    return
-
+class CNN():
+    def __init__(self, numChannels, classes):
+        super(XonoxNetwork, self).__init__()
+        self
 def traduce_output():
     return
 
