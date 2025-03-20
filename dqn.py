@@ -59,19 +59,15 @@ def read_CNN():
 def write_CNN():
     return
 
-class XonoxNetwork():
-    def __init__(self, ):
+class XonoxNetwork(nn.Module):
+    def __init__(self):
         super(DQN, self).__init__()
         self.conv1 = nn.Conv2d(12, 256, kernel_size=3, padding=1)
-        self.bn1 = nn.BatchNorm2d(256)
         self.conv2 = nn.Conv2d(256, 512, kernel_size=3, padding=1)
-        self.bn2 = nn.BatchNorm2d(512)
         self.conv3 = nn.Conv2d(512, 1024, kernel_size=3, padding=1)
-        self.bn3 = nn.BatchNorm2d(1024)
-        self.dropout = nn.Dropout2d(0.3)
         self.fc1 = nn.Linear(1024 * 8 * 8, 4096)
         self.fc2 = nn.Linear(4096, 2048)
-        self.fc3 = nn.Linear(2048, action_space_size)
+        self.fc3 = nn.Linear(2048, 2592)
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
@@ -96,7 +92,7 @@ def traduce_output(prefered_output: int):
     prefered_output = prefered_output//2
     move += CASES_TOTEM[prefered_output%6] + f"{(prefered_output//6)%6 +1}"
     prefered_output = prefered_output//(36)
-    
+
     move += CASES_TOTEM[prefered_output%6] + f"{(prefered_output//6)%6 +1}"
     prefered_output = prefered_output//(36)
     return move
@@ -124,3 +120,13 @@ board = [
 ]
 tensor = convert_board(board, "Paul", "Jeanne", "Paul")
 print_tensor(tensor)
+
+# Tester si toutes les actions possibles sont prises en compte
+""" l = []
+for i in range(100000):
+    action = dqn.traduce_output(i)
+    if action in l:
+        print(len(l))
+        break
+    else:
+        l.append(action) """
