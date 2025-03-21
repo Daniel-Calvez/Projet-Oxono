@@ -11,7 +11,25 @@ import random
 import model 
 import numpy as np
 from icecream import ic
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
+class DQNModel(nn.Module):
+    def __init__(self):
+        super(DQNModel, self).__init__()
+        self.conv1 = nn.Conv2d(3, 6, 5)
+        # ???
+
+    # def forward(self, x):
+    #     x = self.pool(F.relu(self.conv1(x)))
+    #     x = self.pool(F.relu(self.conv2(x)))
+    #     x = x.view(-1, 16 * 5 * 5)
+    #     x = F.relu(self.fc1(x))
+    #     x = F.relu(self.fc2(x))
+    #     x = self.fc3(x)
+    #     return x
+    
 def print_tensor(tensor):
     for k in range(7):
         print(f"Couche{k}")
@@ -48,11 +66,12 @@ def convert_board(board, player1, player2, active_player) -> np.array:
 
     return tensor
 
-def read_CNN():
-    return
+def read_CNN(model, filepath):
+    model = torch.load(filepath, weights_only=False)
+    return model
 
-def write_CNN():
-    return
+def write_CNN(model, filepath):
+    torch.save(model.state_dict(), filepath)
 
 class XonoxNetwork(nn.Module):
     def __init__(self):
