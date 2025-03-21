@@ -14,30 +14,31 @@ from icecream import ic
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import model
+from pathlib import Path
 
-class DQNModel(nn.Module):
-    def __init__(self):
-        super(DQNModel, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
-        # ???
-
-    # def forward(self, x):
-    #     x = self.pool(F.relu(self.conv1(x)))
-    #     x = self.pool(F.relu(self.conv2(x)))
-    #     x = x.view(-1, 16 * 5 * 5)
-    #     x = F.relu(self.fc1(x))
-    #     x = F.relu(self.fc2(x))
-    #     x = self.fc3(x)
-    #     return x
-    
-def print_tensor(tensor):
+def print_tensor(tensor: np.array):
+    '''
+    Loop over the layers to print the tensor as a human could understand it
+    '''
     for k in range(7):
         print(f"Couche{k}")
         for i in range(6):
             print(" ".join(str(tensor[i,j,k]) for j in range(6)))
 
-def convert_board(board, player1, player2, active_player) -> np.array:
+def convert_board(board: list[list[str]], player1: str, player2: str, active_player: str) -> np.array:
+    '''
+    Convert the board into a numpy tensor
+    7 layers : player1 X, player1 O, player2 X, player2 O, totem X, totem O, active player
+    Args:
+        the board as a matrix
+        player 1 name
+        player 2 name
+        active player name
+    Returns
+        the board as a numpy tensor
+    Exception
+        No exception
+    '''
     tensor = np.zeros((6,6,7), dtype=np.int8)
 
     for i, irow in enumerate(board):
@@ -67,11 +68,17 @@ def convert_board(board, player1, player2, active_player) -> np.array:
 
     return tensor
 
-def read_CNN(model, filepath):
+def load_CNN(filepath):
+    ''' Load the network from a file '''
+    path = Path(filepath)
+    # Create a new network if none exists
+    if not path.exists():
+        return XonoxNetwork()
     model = torch.load(filepath, weights_only=False)
     return model
 
 def write_CNN(model, filepath):
+    ''' Save the network into a file '''
     torch.save(model.state_dict(), filepath)
 
 class XonoxNetwork(nn.Module):
@@ -97,7 +104,16 @@ class XonoxNetwork(nn.Module):
         x = self.fc3(x)
         return exp(x)
 
-def traduce_output(output: int):
+def traduce_output(output: int) -> str:
+    '''
+    Convert the output of the CNN to an Oxono action
+    Args:
+        output : index of the CNN's output
+    Returns
+        action in Oxono format
+    Exception:
+        No Exception
+    '''
     CASES_TOTEM = {0:"A",1:"B",2:"C",3:"D",4:"E",5:"F"}
     move=""
     if output%2 == 0:
@@ -132,6 +148,7 @@ def feedback():
 def loss():
     return
 
+cnn_xonox = load_CNN('xonox_network.bbl')
 
 board = [
     ['P_O', '   ', '   ', '   ', '   ', '   '],
@@ -154,7 +171,12 @@ for i in range(100000):
         l.append(action) """
 
 a = XonoxNetwork()
+
+import datetime
+start = datetime.datetime.now()
 vector = list(a(tensor.unsqueeze(0))[0].tolist())
 outp = (filter_outputs(vector, board, "Paul"))
+end = datetime.datetime.now()
+ic((end-start)/1000)
 """ print(outp)
 print(random_select(outp)) """

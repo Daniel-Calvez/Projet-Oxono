@@ -8,6 +8,7 @@ Daniel Calvez & Vincent Ducot
 import random
 import model as model
 from icecream import ic
+import dqn
 
 def name() -> str:
     '''
@@ -124,6 +125,8 @@ def ask_play(board: list[list[str]], player: str, opponent: str, ia_level: int =
     '''
     if ia_level == 0 or ia_level == 1:
         action = random_play(board, ia_level, player)
+    elif ia_level == 2:
+        action = dqn_play(board, player, cnn)
 
     print(f"Action computed {action}")
     return action
