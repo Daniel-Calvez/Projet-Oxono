@@ -322,7 +322,7 @@ if __name__ == "__main__":
     
     # Entraînement du modèle
     trained_network = train_dqn(
-        num_episodes=20,
+        num_episodes=400,
         batch_size=32,
         gamma=0.99,
         epsilon_start=1.0, 
@@ -333,4 +333,4 @@ if __name__ == "__main__":
     )
     
     # Évaluation du modèle
-    evaluate_model(model_path, num_games=10)
+    evaluate_model(model_path, num_games=100)
