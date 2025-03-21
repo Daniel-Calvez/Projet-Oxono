@@ -325,7 +325,7 @@ if __name__ == "__main__":
         num_episodes=400,
         batch_size=32,
         gamma=0.99,
-        epsilon_start=1.0, 
+        epsilon_start=0.1000, 
         epsilon_end=0.1,
         epsilon_decay=0.995,
         learning_rate=0.001,
