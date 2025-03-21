@@ -5,13 +5,8 @@ Daniel Calvez & Vincent Ducot
 2025
 '''
 
-from torch import flatten
-from torch.nn import Module
-from torch.nn import Conv2d
-from torch.nn import Linear
-from torch.nn import MaxPool2d
-from torch.nn import ReLU
-from torch.nn import LogSoftmax
+from torch import flatten, nn, from_numpy
+import torch.nn.functional as F
 import random
 import model 
 import numpy as np
@@ -61,22 +56,23 @@ def write_CNN():
 
 class XonoxNetwork(nn.Module):
     def __init__(self):
-        super(DQN, self).__init__()
-        self.conv1 = nn.Conv2d(12, 256, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(256, 512, kernel_size=3, padding=1)
-        self.conv3 = nn.Conv2d(512, 1024, kernel_size=3, padding=1)
-        self.fc1 = nn.Linear(1024 * 8 * 8, 4096)
-        self.fc2 = nn.Linear(4096, 2048)
-        self.fc3 = nn.Linear(2048, 2592)
+        super(XonoxNetwork, self).__init__()
+        self.conv1 = nn.Conv2d(6, 216, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(216)
+        self.conv2 = nn.Conv2d(216, 432, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm2d(432)
+        self.conv3 = nn.Conv2d(432, 864, kernel_size=3, padding=1)
+        self.bn3 = nn.BatchNorm2d(864)
+        self.fc1 = nn.Linear(864*6*6, 2304)
+        self.fc2 = nn.Linear(2304, 1152)
+        self.fc3 = nn.Linear(1152, 2592)
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        x = self.dropout(x)
         x = x.view(x.size(0), -1)
         x = F.relu(self.fc1(x))
-        x = F.dropout(x, p=0.3, training=self.training)
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
         return x
@@ -119,14 +115,17 @@ board = [
     ['   ', '   ', '   ', '   ', '   ', 'J_X']
 ]
 tensor = convert_board(board, "Paul", "Jeanne", "Paul")
-print_tensor(tensor)
-
+tensor = from_numpy(np.astype(tensor, np.float32))
+ic(tensor)
 # Tester si toutes les actions possibles sont prises en compte
 """ l = []
 for i in range(100000):
-    action = dqn.traduce_output(i)
+    action = traduce_output(i)
     if action in l:
         print(len(l))
         break
     else:
         l.append(action) """
+
+a = XonoxNetwork()
+print(a(tensor.unsqueeze(0)))
