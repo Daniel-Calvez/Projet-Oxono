@@ -84,7 +84,7 @@ def random_play(board: list[list[str]], ia_level: int, player: str) -> str:
             if 1, first tries to win the game, if not possible plays random
         The player's name
     Return 
-        The action as a string
+        The action as a string, None if no action is available
     Exception
         No exception
     '''
@@ -106,6 +106,8 @@ def random_play(board: list[list[str]], ia_level: int, player: str) -> str:
     totem_move = random.choice(list(all_totem))
     #ic(totem_move)
     all_drops = all_pawn_moves(board, totem_move, totem)
+    if len(all_drops) == 0:
+        return None
     #ic(all_drops)
     pawn_move = random.choice(list(all_drops))
     action = f"{totem[-1]}{model.reverse_convert_coord(totem_move)}{model.reverse_convert_coord(pawn_move)}"

@@ -62,8 +62,8 @@ def convert_board(board: list[list[str]], player1: str, player2: str, active_pla
             if active_player == player1:
                 tensor[i,j, 6] = 0
             else:
-                ic(active_player)
-                ic(player1)
+                # ic(active_player)
+                # ic(player1)
                 tensor[i,j, 6] = 1
 
     return tensor
@@ -72,9 +72,9 @@ def load_CNN(filepath):
     ''' Load the network from a file '''
     path = Path(filepath)
     # Create a new network if none exists
-    if not path.exists():
-        return XonoxNetwork()
-    model = torch.load(filepath, weights_only=False)
+    model = XonoxNetwork()
+    if path.exists():
+        model.load_state_dict(torch.load(filepath, weights_only=True))
     return model
 
 def write_CNN(model, filepath):
@@ -149,34 +149,3 @@ def loss():
     return
 
 cnn_xonox = load_CNN('xonox_network.bbl')
-
-board = [
-    ['P_O', '   ', '   ', '   ', '   ', '   '],
-    ['   ', '   ', '   ', '   ', '   ', '   '],
-    ['   ', 'P_X', '   ', 'P_X', 'T_O', '   '],
-    ['   ', 'P_X', 'T_X', 'P_O', 'J_O', '   '],
-    ['   ', '   ', 'J_O', '   ', '   ', '   '],
-    ['   ', '   ', '   ', '   ', '   ', 'J_X']
-]
-tensor = convert_board(board, "Paul", "Jeanne", "Paul")
-tensor = from_numpy(np.astype(tensor, np.float32))
-# Tester si toutes les actions possibles sont prises en compte
-""" l = []
-for i in range(100000):
-    action = traduce_output(i)
-    if action in l:
-        print(len(l))
-        break
-    else:
-        l.append(action) """
-
-a = XonoxNetwork()
-
-import datetime
-start = datetime.datetime.now()
-vector = list(a(tensor.unsqueeze(0))[0].tolist())
-outp = (filter_outputs(vector, board, "Paul"))
-end = datetime.datetime.now()
-ic((end-start)/1000)
-""" print(outp)
-print(random_select(outp)) """
