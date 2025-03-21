@@ -82,7 +82,7 @@ class XonoxNetwork(nn.Module):
         self.bn2 = nn.BatchNorm2d(432)
         self.conv3 = nn.Conv2d(432, 864, kernel_size=3, padding=1)
         self.bn3 = nn.BatchNorm2d(864)
-        self.fc1 = nn.Linear(864*6*6, 2304)
+        self.fc1 = nn.Linear(36288, 2304)
         self.fc2 = nn.Linear(2304, 1152)
         self.fc3 = nn.Linear(1152, 2592)
 
