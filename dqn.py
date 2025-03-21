@@ -5,7 +5,7 @@ Daniel Calvez & Vincent Ducot
 2025
 '''
 
-from torch import flatten, nn, from_numpy
+from torch import flatten, nn, from_numpy, exp
 import torch.nn.functional as F
 import random
 import model 
@@ -14,6 +14,7 @@ from icecream import ic
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import model
 
 class DQNModel(nn.Module):
     def __init__(self):
@@ -94,29 +95,36 @@ class XonoxNetwork(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
-        return x
+        return exp(x)
 
-def traduce_output(prefered_output: int):
+def traduce_output(output: int):
     CASES_TOTEM = {0:"A",1:"B",2:"C",3:"D",4:"E",5:"F"}
     move=""
-    if prefered_output%2 == 0:
+    if output%2 == 0:
         move +="X"
     else:
         move += "O"
 
-    prefered_output = prefered_output//2
-    move += CASES_TOTEM[prefered_output%6] + f"{(prefered_output//6)%6 +1}"
-    prefered_output = prefered_output//(36)
+    output = output//2
+    move += CASES_TOTEM[output%6] + f"{(output//6)%6 +1}"
+    output = output//(36)
 
-    move += CASES_TOTEM[prefered_output%6] + f"{(prefered_output//6)%6 +1}"
-    prefered_output = prefered_output//(36)
+    move += CASES_TOTEM[output%6] + f"{(output//6)%6 +1}"
+    output = output//(36)
     return move
 
-def filter_outputs():
-    return
+def filter_outputs(result, board, player):
+    action_table = [[],[]]
+    for i in range(len(result)):
+        action = traduce_output(i)
+        if model.is_valid_action(board, action, player):
+            action_table[0].append(action) 
+            action_table[1].append(result[i])
+    return action_table
 
-def random_select():
-    return
+def random_select(action_table):
+    action = random.choices(action_table[0], action_table[1], k=1)
+    return action
 
 def feedback():
     return
@@ -135,7 +143,6 @@ board = [
 ]
 tensor = convert_board(board, "Paul", "Jeanne", "Paul")
 tensor = from_numpy(np.astype(tensor, np.float32))
-ic(tensor)
 # Tester si toutes les actions possibles sont prises en compte
 """ l = []
 for i in range(100000):
@@ -147,4 +154,7 @@ for i in range(100000):
         l.append(action) """
 
 a = XonoxNetwork()
-print(a(tensor.unsqueeze(0)))
+vector = list(a(tensor.unsqueeze(0))[0].tolist())
+outp = (filter_outputs(vector, board, "Paul"))
+""" print(outp)
+print(random_select(outp)) """
