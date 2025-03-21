@@ -5,6 +5,13 @@ Daniel Calvez & Vincent Ducot
 2025
 '''
 
+from torch import flatten
+from torch.nn import Module
+from torch.nn import Conv2d
+from torch.nn import Linear
+from torch.nn import MaxPool2d
+from torch.nn import ReLU
+from torch.nn import LogSoftmax
 import random
 import model 
 import numpy as np
@@ -71,11 +78,43 @@ def read_CNN(model, filepath):
 def write_CNN(model, filepath):
     torch.save(model.state_dict(), filepath)
 
-def cnn():
-    return
+class XonoxNetwork(nn.Module):
+    def __init__(self):
+        super(DQN, self).__init__()
+        self.conv1 = nn.Conv2d(12, 256, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(256, 512, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(512, 1024, kernel_size=3, padding=1)
+        self.fc1 = nn.Linear(1024 * 8 * 8, 4096)
+        self.fc2 = nn.Linear(4096, 2048)
+        self.fc3 = nn.Linear(2048, 2592)
 
-def traduce_output():
-    return
+    def forward(self, x):
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bn2(self.conv2(x)))
+        x = F.relu(self.bn3(self.conv3(x)))
+        x = self.dropout(x)
+        x = x.view(x.size(0), -1)
+        x = F.relu(self.fc1(x))
+        x = F.dropout(x, p=0.3, training=self.training)
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+
+def traduce_output(prefered_output: int):
+    CASES_TOTEM = {0:"A",1:"B",2:"C",3:"D",4:"E",5:"F"}
+    move=""
+    if prefered_output%2 == 0:
+        move +="X"
+    else:
+        move += "O"
+
+    prefered_output = prefered_output//2
+    move += CASES_TOTEM[prefered_output%6] + f"{(prefered_output//6)%6 +1}"
+    prefered_output = prefered_output//(36)
+
+    move += CASES_TOTEM[prefered_output%6] + f"{(prefered_output//6)%6 +1}"
+    prefered_output = prefered_output//(36)
+    return move
 
 def filter_outputs():
     return
@@ -100,3 +139,13 @@ board = [
 ]
 tensor = convert_board(board, "Paul", "Jeanne", "Paul")
 print_tensor(tensor)
+
+# Tester si toutes les actions possibles sont prises en compte
+""" l = []
+for i in range(100000):
+    action = dqn.traduce_output(i)
+    if action in l:
+        print(len(l))
+        break
+    else:
+        l.append(action) """
