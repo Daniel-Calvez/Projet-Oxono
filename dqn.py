@@ -7,7 +7,7 @@ Daniel Calvez & Vincent Ducot
 
 from pathlib import Path
 import random
-from torch import nn, load, save, exp
+from torch import nn, load, save, exp, from_numpy
 import torch.nn.functional as F
 import numpy as np
 # from icecream import ic
@@ -187,15 +187,34 @@ def random_select(action_table) -> str:
     Exception
         No exception
     '''
-    action = random.choices(action_table[0], action_table[1], k=1)
+    max_pos = action_table[1].index(max(action_table[1]))
+    action = action_table[0][max_pos]
     return action
+
+def dqn_play(cnn: list[int], board: list[list[str]], player1: str, player2: str, active_player: str) -> str:
+    '''
+    Compute the best move according to the DQN network
+    Args
+        The CNN output as a list
+        The board as a matrix
+        Player1's name
+        Player2's name
+        Current player name
+    Returns
+        An action as a string
+    Exception
+        No exception
+    '''
+    tensor = convert_board(board, player1, player2, active_player)
+    tensor = from_numpy(np.astype(tensor, np.float32))
+    outputs = filter_outputs(cnn(tensor.unsqueeze(0))[0].tolist(), board, active_player)
+    return random_select(outputs)
 
 # Load or create a CNN model when this module is loaded
 cnn_xonox = load_cnn('xonox_network.bbl')
 
-'''
 
-board = [
+""" board = [
     ['P_O', '   ', '   ', '   ', '   ', '   '],
     ['   ', '   ', '   ', '   ', '   ', '   '],
     ['   ', 'P_X', '   ', 'P_X', 'T_O', '   '],
@@ -203,26 +222,8 @@ board = [
     ['   ', '   ', 'J_O', '   ', '   ', '   '],
     ['   ', '   ', '   ', '   ', '   ', 'J_X']
 ]
-tensor = convert_board(board, "Paul", "Jeanne", "Paul")
-tensor = from_numpy(np.astype(tensor, np.float32))
-# Tester si toutes les actions possibles sont prises en compte
-""" l = []
-for i in range(100000):
-    action = traduce_output(i)
-    if action in l:
-        print(len(l))
-        break
-    else:
-        l.append(action) """
 
-a = XonoxNetwork()
+now = datetime.datetime.now()
+action = dqn_play(cnn_xonox, board, "Paul", "Jeanne", "Paul")
 
-import datetime
-start = datetime.datetime.now()
-vector = list(a(tensor.unsqueeze(0))[0].tolist())
-outp = (filter_outputs(vector, board, "Paul"))
-end = datetime.datetime.now()
-ic((end-start)/1000)
-""" print(outp)
-print(random_select(outp)) """
-'''
+ """
