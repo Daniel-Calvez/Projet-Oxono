@@ -13,6 +13,7 @@ import torch
 import torch.nn.functional as F
 from torch import optim
 import ia
+from matplotlib import pyplot as plt
 import model
 import dqn
 
@@ -72,8 +73,8 @@ def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
     wins = 0
     losses = 0
     draws = 0
-
-    for epoch in range(num_epochs):
+    winrate= []
+    for episode in range(num_episodes):
         # Init a new game
         board = model.init_board()
         player1 = "DQN"
@@ -218,13 +219,14 @@ def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
         # Model evaluation
         if (epoch + 1) % eval_interval == 0:
             win_rate = wins / (wins + losses + draws) if (wins + losses + draws) > 0 else 0
-            print(f"Epoch {epoch+1}: Wins: {wins}, Losses: {losses}, Draws: {draws}, Win rate: {win_rate:.4f}")
+            winrate.append(evaluate_model("", eval_number, network))
+            print(f"Épisode {episode+1}: Victoires: {wins}, Défaites: {losses}, Nuls: {draws}, Taux de victoire: {win_rate:.4f}")
+            # Réinitialisation des compteurs pour la prochaine période d'évaluation
             wins, losses, draws = 0, 0, 0
-
-    # Final save of the model
-    dqn.write_cnn(network, save_path)
-    print(f"Training over, save the model to {save_path}")
-    return network
+    # Sauvegarde finale du modèle
+    write_CNN(network, save_path)
+    print(f"Entraînement terminé. Modèle final sauvegardé à {save_path}")
+    return network, winrate
 
 def evaluate_model(model_path: str, num_games: int):
     '''
@@ -233,12 +235,14 @@ def evaluate_model(model_path: str, num_games: int):
     Args:
         Filepath of the model
         Number of games to play for the evaluation
+        The neural network to test ("" if out of epoch loops)
     
     Returns:
         Winning rate of the DQN model
     '''
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    network = dqn.load_cnn(model_path)
+    if(cnn == ""): network = load_CNN(model_path)
+    else: network = cnn
     network.to(device)
     network.eval()
 
@@ -309,19 +313,24 @@ def evaluate_model(model_path: str, num_games: int):
     return win_rate
 
 if __name__ == "__main__":
-    MODEL_PATH = "xonox_network2.bbl"
-
-    # Model's training
-    trained_network = train_dqn(
-        num_epochs=4,
-        batch_size=1,
+    # Exemple d'utilisation
+    model_path = "xonox_network.bbl"
+    
+    # Entraînement du modèle
+    trained_network, winrate = train_dqn(
+        num_episodes=200,
+        batch_size=32,
         gamma=0.99,
-        epsilon_start=0.1000,
+        epsilon_start=1.0, 
         epsilon_end=0.1,
         epsilon_decay=0.995,
         learning_rate=0.001,
-        save_path=MODEL_PATH
+        save_path=model_path,
+        eval_interval=10,
+        eval_number=50
     )
-
-    # Model's evaluation
-    evaluate_model(MODEL_PATH, num_games=2)
+    plt.plot(winrate, label = "taux de victoire contre l'aléatoire")
+    plt.legend()
+    plt.show()
+    # Évaluation du modèle
+    evaluate_model(model_path, num_games=100)
