@@ -7,7 +7,7 @@ Daniel Calvez & Vincent Ducot
 
 import random
 import model
-# from dqn import dqn_play
+from dqn import dqn_play
 
 def name() -> str:
     '''

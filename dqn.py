@@ -6,7 +6,6 @@ Daniel Calvez & Vincent Ducot
 '''
 
 from pathlib import Path
-import random
 from torch import nn, load, save, exp, from_numpy
 import torch.nn.functional as F
 import numpy as np

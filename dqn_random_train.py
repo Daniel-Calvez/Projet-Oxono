@@ -6,6 +6,7 @@ Daniel Calvez & Vincent Ducot
 Using pytorch
 https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 '''
+
 import random
 from collections import deque
 from pathlib import Path
@@ -41,7 +42,7 @@ class ReplayMemory:
 
 def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
              epsilon_end=0.1, epsilon_decay=0.995, learning_rate=0.001,
-             save_path='xonox.dqn', save_interval=20, eval_interval=25):
+             save_path='xonox.dqn', save_interval=20, eval_interval=25, eval_number=50):
     '''
     Train the DQN network to play against random player
     
@@ -56,6 +57,7 @@ def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
         save_path: Filepath of the model
         save_interval: Number of epochs between saving the model 
         eval_interval: Number of epochs between evaluating the model
+        eval_number: Number of 
     Returns
         The trained network
     '''
@@ -73,8 +75,8 @@ def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
     wins = 0
     losses = 0
     draws = 0
-    winrate= []
-    for episode in range(num_episodes):
+    win_rate= []
+    for epoch in range(num_epochs):
         # Init a new game
         board = model.init_board()
         player1 = "DQN"
@@ -219,30 +221,31 @@ def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
         # Model evaluation
         if (epoch + 1) % eval_interval == 0:
             win_rate = wins / (wins + losses + draws) if (wins + losses + draws) > 0 else 0
-            winrate.append(evaluate_model("", eval_number, network))
-            print(f"Épisode {episode+1}: Victoires: {wins}, Défaites: {losses}, Nuls: {draws}, Taux de victoire: {win_rate:.4f}")
+            win_rate.append(evaluate_model("", eval_number, network))
+            print(f"Épisode {epoch+1}: Victoires: {wins}, Défaites: {losses}, Nuls: {draws}, Taux de victoire: {win_rate:.4f}")
             # Réinitialisation des compteurs pour la prochaine période d'évaluation
             wins, losses, draws = 0, 0, 0
     # Sauvegarde finale du modèle
-    write_CNN(network, save_path)
+    dqn.write_cnn(network, save_path)
     print(f"Entraînement terminé. Modèle final sauvegardé à {save_path}")
-    return network, winrate
+    return network, win_rate
 
-def evaluate_model(model_path: str, num_games: int):
+def evaluate_model(model_path: str, num_games: int, cnn: dqn.XonoxNetwork) -> int:
     '''
     Evaluate the DQN model's performance against a random player
     
     Args:
         Filepath of the model
         Number of games to play for the evaluation
-        The neural network to test ("" if out of epoch loops)
-    
+        The neural network to test (None if out of epoch loops)
     Returns:
         Winning rate of the DQN model
     '''
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    if(cnn == ""): network = load_CNN(model_path)
-    else: network = cnn
+    if cnn is None:
+        network = dqn.load_cnn(model_path)
+    else: 
+        network = cnn
     network.to(device)
     network.eval()
 
@@ -313,24 +316,24 @@ def evaluate_model(model_path: str, num_games: int):
     return win_rate
 
 if __name__ == "__main__":
-    # Exemple d'utilisation
-    model_path = "xonox_network.bbl"
-    
-    # Entraînement du modèle
+    MODEL_PATH = "xonox_network.bbl"
+
+    # Model training
     trained_network, winrate = train_dqn(
-        num_episodes=200,
+        num_epochs=200,
         batch_size=32,
         gamma=0.99,
         epsilon_start=1.0, 
         epsilon_end=0.1,
         epsilon_decay=0.995,
         learning_rate=0.001,
-        save_path=model_path,
+        save_path=MODEL_PATH,
         eval_interval=10,
         eval_number=50
     )
-    plt.plot(winrate, label = "taux de victoire contre l'aléatoire")
+    plt.plot(winrate, label = "Winning rate against random IA")
     plt.legend()
     plt.show()
-    # Évaluation du modèle
-    evaluate_model(model_path, num_games=100)
+
+    # Model evaluation
+    evaluate_model(MODEL_PATH, 100, None)
