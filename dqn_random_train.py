@@ -57,9 +57,10 @@ def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
         save_path: Filepath of the model
         save_interval: Number of epochs between saving the model 
         eval_interval: Number of epochs between evaluating the model
-        eval_number: Number of 
+        eval_number: Number of games played for evaluating the model at each interval
     Returns
         The trained network
+        The win rates over the training as a list
     '''
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -75,7 +76,7 @@ def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
     wins = 0
     losses = 0
     draws = 0
-    win_rate= []
+    winrates = []
     for epoch in range(num_epochs):
         # Init a new game
         board = model.init_board()
@@ -221,14 +222,14 @@ def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
         # Model evaluation
         if (epoch + 1) % eval_interval == 0:
             win_rate = wins / (wins + losses + draws) if (wins + losses + draws) > 0 else 0
-            win_rate.append(evaluate_model("", eval_number, network))
-            print(f"Épisode {epoch+1}: Victoires: {wins}, Défaites: {losses}, Nuls: {draws}, Taux de victoire: {win_rate:.4f}")
-            # Réinitialisation des compteurs pour la prochaine période d'évaluation
+            winrates.append(evaluate_model("", eval_number, network))
+            print(f"Epoch {epoch+1}: Wins: {wins}, Losses: {losses}, Draws: {draws}, Winning rate: {win_rate:.4f}")
             wins, losses, draws = 0, 0, 0
-    # Sauvegarde finale du modèle
+
+    # Final save of the model
     dqn.write_cnn(network, save_path)
-    print(f"Entraînement terminé. Modèle final sauvegardé à {save_path}")
-    return network, win_rate
+    print(f"Training over, save the model to {save_path}")
+    return network, winrates
 
 def evaluate_model(model_path: str, num_games: int, cnn: dqn.XonoxNetwork) -> int:
     '''
@@ -308,7 +309,7 @@ def evaluate_model(model_path: str, num_games: int, cnn: dqn.XonoxNetwork) -> in
 
                 current_player = player1
 
-    win_rate = wins / num_games
+    win_rate = wins / num_games * 100
     print(f"Evaluation on {num_games} games:")
     print(f"Wins: {wins}, Losses: {losses}, Draws: {draws}")
     print(f"Winning rate: {win_rate:.4f}")
@@ -316,10 +317,10 @@ def evaluate_model(model_path: str, num_games: int, cnn: dqn.XonoxNetwork) -> in
     return win_rate
 
 if __name__ == "__main__":
-    MODEL_PATH = "xonox_network.bbl"
+    MODEL_PATH = "xonox_network2.bbl"
 
     # Model training
-    trained_network, winrate = train_dqn(
+    trained_network, winrates = train_dqn(
         num_epochs=200,
         batch_size=32,
         gamma=0.99,
@@ -331,9 +332,11 @@ if __name__ == "__main__":
         eval_interval=10,
         eval_number=50
     )
-    plt.plot(winrate, label = "Winning rate against random IA")
+
+    plt.plot(winrates, label = "Winning rate against random IA")
     plt.legend()
     plt.show()
+    plt.savefig('random_train.jpg')
 
     # Model evaluation
     evaluate_model(MODEL_PATH, 100, None)

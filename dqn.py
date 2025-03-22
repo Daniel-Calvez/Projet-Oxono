@@ -210,7 +210,7 @@ def dqn_play(cnn: list[int], board: list[list[str]], player1: str, player2: str,
     return random_select(outputs)
 
 # Load or create a CNN model when this module is loaded
-cnn_xonox = load_cnn('xonox_network.bbl')
+cnn_xonox = load_cnn('xonox.dqn')
 
 
 """ board = [

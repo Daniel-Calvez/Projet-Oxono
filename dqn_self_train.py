@@ -12,6 +12,7 @@ from pathlib import Path
 import torch
 import torch.nn.functional as F
 from torch import optim
+from matplotlib import pyplot as plt
 import ia
 import model
 import dqn
@@ -94,7 +95,7 @@ def select_action(network, board, player1, player2, current_player, epsilon, dev
 
 def train_selfplay(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
              epsilon_end=0.1, epsilon_decay=0.995, learning_rate=0.001,
-             save_path='xonox.dqn', save_interval=20, eval_interval=25):
+             save_path='xonox.dqn', save_interval=20, eval_interval=25, eval_number=50):
     '''
     Train the DQN network to play against random player
     
@@ -109,8 +110,10 @@ def train_selfplay(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
         save_path: Filepath of the model
         save_interval: Number of epochs between saving the model 
         eval_interval: Number of epochs between evaluating the model
+        eval_number: Number of games played for evaluating the model at each interval
     Returns
         The trained network
+        The win rates over the training as a list
     '''
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -127,6 +130,7 @@ def train_selfplay(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
     p2_wins = 0
     draws = 0
 
+    winrates = []
     for epoch in range(num_epochs):
         # Init a new game
         board = model.init_board()
@@ -239,27 +243,31 @@ def train_selfplay(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
         # Model evaluation
         if (epoch + 1) % eval_interval == 0:
             p1_win_rate = p1_wins / (p1_wins + p2_wins + draws) if (p1_wins + p2_wins + draws) > 0 else 0
+            winrates.append(evaluate_against_random("", eval_number, network))
             print(f"Epoch {epoch+1}: P1 wins: {p1_wins}, P2 wins: {p2_wins}, Draws: {draws}, Win rate: {p1_win_rate:.4f}")
             p1_wins, p2_wins, draws = 0, 0, 0
 
     # Final save of the model
     dqn.write_cnn(network, save_path)
     print(f"Training over, save the model to {save_path}")
-    return network
+    return network, winrates
 
-def evaluate_against_random(model_path, num_games=100):
+def evaluate_against_random(model_path, num_games, cnn: dqn.XonoxNetwork) -> int:
     '''
     Evaluate the DQN model's performance against a random player
     
     Args:
         Filepath of the model
         Number of games to play for the evaluation
-    
+        The neural network to test (None if out of epoch loops)
     Returns:
         Winning rate of the DQN model
     '''
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    network = dqn.load_cnn(model_path)
+    if cnn is None:
+        network = dqn.load_cnn(model_path)
+    else: 
+        network = cnn
     network.to(device)
     network.eval()
 
@@ -320,7 +328,7 @@ def evaluate_against_random(model_path, num_games=100):
                 model.move_totem(board, totem, totem_coord)
                 coord_action = model.convert_coord(action[3:])
                 board[coord_action[0]][coord_action[1]] = current_player[0] + '_' + action[0]
-                
+
                 nb_free_cells = len(model.all_free_cells(board))
                 if model.is_winner(board, current_player, coord_action):
                     done = True
@@ -332,7 +340,7 @@ def evaluate_against_random(model_path, num_games=100):
 
                 current_player = player1
 
-    win_rate = wins / num_games
+    win_rate = wins / num_games * 100
     print(f"Evaluation on {num_games} games:")
     print(f"Wins: {wins}, Losses: {losses}, Draws: {draws}")
     print(f"Winning rate: {win_rate:.4f}")
@@ -343,16 +351,23 @@ if __name__ == "__main__":
     MODEL_PATH = "xonox.dqn"
 
     # Model's training by self-play
-    trained_network = train_selfplay(
-        num_epochs=50,
-        batch_size=10,
+    trained_network, winrates = train_selfplay(
+        num_epochs=200,
+        batch_size=20,
         gamma=0.99,
         epsilon_start=0.5,  # Less exploration, as the model is already trained
         epsilon_end=0.05,
         epsilon_decay=0.995,
         learning_rate=0.0005,  # Lower rate to improve the model
-        save_path=MODEL_PATH
+        save_path=MODEL_PATH,
+        eval_interval=10,
+        eval_number=30
     )
 
-    # Model's evaluation
-    evaluate_against_random(MODEL_PATH, num_games=40)
+    plt.plot(winrates, label = "Winning rate against random IA")
+    plt.legend()
+    plt.show()
+    plt.savefig('self_train.jpg')
+
+    # Model evaluation
+    evaluate_against_random(MODEL_PATH, 100, None)
