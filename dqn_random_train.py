@@ -1,5 +1,5 @@
 '''
-Train loop for the Deep-Q-Learning network
+Train loop for the Deep-Q-Learning network against random player
 M1 Bio-info project
 Daniel Calvez & Vincent Ducot
 2025
@@ -41,8 +41,8 @@ class ReplayMemory:
 def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
              epsilon_end=0.1, epsilon_decay=0.995, learning_rate=0.001,
              save_path='xonox.dqn', save_interval=20, eval_interval=25):
-    """
-    Train the DQN network to play
+    '''
+    Train the DQN network to play against random player
     
     Args:
         num_epochs: Number of epochs
@@ -54,8 +54,10 @@ def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
         learning_rate: Learning rate
         save_path: Filepath of the model
         save_interval: Number of epochs between saving the model 
-        eval_interval: Number of epochs between evaluating the model 
-    """
+        eval_interval: Number of epochs between evaluating the model
+    Returns
+        The trained network
+    '''
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Init the network
@@ -211,7 +213,7 @@ def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
         # Save the model to the file
         if (epoch + 1) % save_interval == 0:
             dqn.write_cnn(network, save_path)
-            print(f"Modèle sauvegardé à l'épisode {epoch+1}")
+            print(f"Model saved at epoch {epoch+1}")
 
         # Model evaluation
         if (epoch + 1) % eval_interval == 0:
@@ -225,7 +227,7 @@ def train_dqn(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
     return network
 
 def evaluate_model(model_path: str, num_games: int):
-    """
+    '''
     Evaluate the DQN model's performance against a random player
     
     Args:
@@ -234,7 +236,7 @@ def evaluate_model(model_path: str, num_games: int):
     
     Returns:
         Winning rate of the DQN model
-    """
+    '''
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     network = dqn.load_cnn(model_path)
     network.to(device)
