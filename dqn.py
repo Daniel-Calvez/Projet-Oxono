@@ -139,20 +139,21 @@ def filter_outputs(result, board, player):
     return action_table
 
 def random_select(action_table):
-    action = random.choices(action_table[0], action_table[1], k=1)
+    max_pos = action_table[1].index(max(action_table[1]))
+    action = action_table[0][max_pos]
     return action
 
-def feedback():
-    return
-
-def loss():
-    return
+def dqn_play(cnn, board, player1, player2, active_player):
+    # Cette fonction calcule le meilleur coup a jouer selon le réseau de neurone pour un board et des jooueurs donnés
+    tensor = convert_board(board, player1, player2, active_player)
+    tensor = from_numpy(np.astype(tensor, np.float32))
+    outputs = filter_outputs(cnn(tensor.unsqueeze(0))[0].tolist(), board, active_player)
+    return random_select(outputs)
 
 cnn_xonox = load_CNN('xonox_network.bbl')
 
-'''
 
-board = [
+""" board = [
     ['P_O', '   ', '   ', '   ', '   ', '   '],
     ['   ', '   ', '   ', '   ', '   ', '   '],
     ['   ', 'P_X', '   ', 'P_X', 'T_O', '   '],
@@ -160,26 +161,8 @@ board = [
     ['   ', '   ', 'J_O', '   ', '   ', '   '],
     ['   ', '   ', '   ', '   ', '   ', 'J_X']
 ]
-tensor = convert_board(board, "Paul", "Jeanne", "Paul")
-tensor = from_numpy(np.astype(tensor, np.float32))
-# Tester si toutes les actions possibles sont prises en compte
-""" l = []
-for i in range(100000):
-    action = traduce_output(i)
-    if action in l:
-        print(len(l))
-        break
-    else:
-        l.append(action) """
 
-a = XonoxNetwork()
+now = datetime.datetime.now()
+action = dqn_play(cnn_xonox, board, "Paul", "Jeanne", "Paul")
 
-import datetime
-start = datetime.datetime.now()
-vector = list(a(tensor.unsqueeze(0))[0].tolist())
-outp = (filter_outputs(vector, board, "Paul"))
-end = datetime.datetime.now()
-ic((end-start)/1000)
-""" print(outp)
-print(random_select(outp)) """
-'''
+ """
