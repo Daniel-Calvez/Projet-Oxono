@@ -6,9 +6,8 @@ Daniel Calvez & Vincent Ducot
 '''
 
 import random
-import model as model
-from icecream import ic
-import dqn
+import model
+# from dqn import dqn_play
 
 def name() -> str:
     '''
@@ -25,8 +24,8 @@ def name() -> str:
 def all_pawn_moves(board: list[list[str]], totem_move: tuple[int,int], totem: str) -> set[tuple[int,int]]:
     '''
     Compute all possibilities for placing a pawn
-    Since the intelligence is also in is_valid_action function, we can't only call all_token_drops function
-        Args
+        
+    Args
         The board as a matrix
         The coordinates of the totem's move as a tuple
         The totem as a string
@@ -68,7 +67,7 @@ def try_to_win(board: list[list[str]], totem: str, player: str) -> str:
     for move in all_totem_moves:
         pawn_moves = all_pawn_moves(board, move, totem)
         for drop in pawn_moves:
-            print(f"Test is {drop} is winning")
+            # print(f"Test is {drop} is winning")
             if model.is_winner(board, player, drop):
                 action = f"{totem[-1]}{model.reverse_convert_coord(move)}{model.reverse_convert_coord(drop)}"
                 print(f"Go win with {action}")
@@ -97,23 +96,21 @@ def random_play(board: list[list[str]], ia_level: int, player: str) -> str:
             action = try_to_win(board, 'T_X', player)
         if action is not None:
             return action
-        
+
     # Else, play random
     totem = random.choice(totems)
-    totem_coords = model.find_totem(board, totem)
     all_totem = model.all_totem_moves(board, totem)
-    #ic(all_totem)
     totem_move = random.choice(list(all_totem))
-    #ic(totem_move)
     all_drops = all_pawn_moves(board, totem_move, totem)
+
     if len(all_drops) == 0:
         return None
-    #ic(all_drops)
+
     pawn_move = random.choice(list(all_drops))
     action = f"{totem[-1]}{model.reverse_convert_coord(totem_move)}{model.reverse_convert_coord(pawn_move)}"
     return action
 
-def ask_play(board: list[list[str]], player: str, opponent: str, ia_level: int = 0) -> str:
+def ask_play(board: list[list[str]], player: str, ia_level: int = 0) -> str:
     '''
     Ask the IA its action
     Args
@@ -123,12 +120,14 @@ def ask_play(board: list[list[str]], player: str, opponent: str, ia_level: int =
     Returns
         The action as a string
     Exception
-        No exception
+        ValueError if ia_level is not known
     '''
-    if ia_level == 0 or ia_level == 1:
+    if ia_level in (0,1):
         action = random_play(board, ia_level, player)
     elif ia_level == 2:
-        action = dqn_play(board, player, cnn)
+        action = dqn_play(board, player)
+    else:
+        raise ValueError("Unexpected IA level")
 
     print(f"Action computed {action}")
     return action

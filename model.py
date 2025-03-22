@@ -6,9 +6,10 @@ Daniel Calvez & Vincent Ducot
 '''
 
 import random as rd
+from copy import deepcopy
 from icecream import ic
 from colorama import Fore, Style
-from copy import deepcopy
+
 
 EMPTY_CELL = '   '
 PINK_PLAYER = ""
@@ -69,7 +70,7 @@ def str_board(board: list[list[str]]) -> str:
     displayed_board += "  ╰───┴───┴───┴───┴───┴───╯"
     return displayed_board
 
-def str_board_colored(board: list[list[str]], player1: str, player2: str) -> str:
+def str_board_colored(board: list[list[str]]) -> str:
     '''
     Returns a string representing the board, with color for each player and totems
     Args
@@ -200,7 +201,7 @@ def is_totem_fully_landlocked(board: list[list[str]], coord: tuple[int,int]) -> 
         for row in range(x+1, len(board)):
             if board[row][y] == EMPTY_CELL:
                 return False
-            
+        
     # Left
     if y - 1 >= 0:
         col = y-1
@@ -393,7 +394,7 @@ def all_token_drops(board: list[list[str]], totem_coord: tuple[int,int]) -> set[
 
     if is_landlocked(board, totem_coord):
         accessible_positions= all_free_cells(board)
-    
+
     return set(accessible_positions)
 
 def valid_player_names(player1: str, player2:str) -> bool:
@@ -442,11 +443,11 @@ def reverse_convert_coord(coord: tuple[int, int]) -> str:
         The coordinates as a string
     '''
     valid_letters = ["A","B","C","D","E","F"]
-    
+
     # Check if the tuple coordinates are within valid bounds
     if not (0 <= coord[0] <= 5 and 0 <= coord[1] <= 5):
         raise ValueError(f"Coordonnées {coord} incorrectes")
-    
+
     # Return the coordinates in string format
     return f"{valid_letters[coord[1]]}{coord[0] + 1}"
 
@@ -492,7 +493,6 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
 
     totem_moves = all_totem_moves(board, totem)
     totem_coord = convert_coord(action[1:3])
-    curr_coord_totem = find_totem(board,totem)
     #print(totem_moves)
     if totem_coord not in totem_moves:
         #print("Totem move impossible")
@@ -525,7 +525,7 @@ def ask_play(board: list[list[str]], player: str, opponent: str) -> str:
         No exception
     '''
 
-    print(str_board_colored(board, player, opponent))
+    print(str_board_colored(board))
     valid_action = False
     action = ""
     while not valid_action:
@@ -596,32 +596,34 @@ def is_winner(board: list[list[str]], player: str, coord: tuple[int,int]) -> boo
     is_symbol = True
     # Same loop but horizontal
     while horizontal_pos<len(board):
-        # Goes forward from the start if the loop is out of bounds oor if both chains stopped while parsing backward
+        # Goes forward from the start if the loop is out of bounds or
+        # if both chains stopped while parsing backward
         if(horizontal_pos<0 or  (not(is_color or is_symbol) and offset <0)):
             horizontal_pos=coord[1] +1
             offset = 1
             is_color = True
             is_symbol = True
             continue
-        
+
         # If the symbol chain is on and the symbol is right, extends the chain, else stops it
-        if(is_symbol and board[coord[0]][horizontal_pos][2]==token[2] and board[coord[0]][horizontal_pos][0]!="T"):
+        if is_symbol and board[coord[0]][horizontal_pos][2] == token[2] \
+            and board[coord[0]][horizontal_pos][0]!="T":
             symbol_score +=1
         else:
             is_symbol = False
 
         # If the color chain is on and the symbol is right, extends the chain, else stops it
-        if(is_color and board[coord[0]][horizontal_pos][0] == token[0] and board[coord[0]][horizontal_pos][0]!="T"):
+        if (is_color and board[coord[0]][horizontal_pos][0] == token[0] \
+           and board[coord[0]][horizontal_pos][0] != "T"):
             color_score += 1
         else:
-            is_color=False        
-        
+            is_color=False
+
         # If at least one of the chains reached 4 return true
-        if(symbol_score==4 or color_score==4):
+        if symbol_score == 4 or color_score == 4:
             return True
         # Stops if the loop if both chains stopped while parsing forward
-        if(not(is_color or is_symbol)and offset>0):
+        if not(is_color or is_symbol) and offset > 0:
             break
         horizontal_pos += offset
     return False
-    
