@@ -201,7 +201,7 @@ def train_selfplay(num_epochs=100, batch_size=16, gamma=0.99, epsilon_start=1.0,
         # Train the network if there are enough games for a batch
         if len(memory) > batch_size:
             batch = memory.sample(batch_size)
-            states, actions, rewards, next_states, dones, _ = zip(*batch)
+            states, actions, rewards, next_states, dones = zip(*batch)
 
             states = torch.cat(states).to(device)
             actions = torch.tensor(actions, dtype=torch.int64).to(device)
@@ -340,12 +340,12 @@ def evaluate_against_random(model_path, num_games=100):
     return win_rate
 
 if __name__ == "__main__":
-    MODEL_PATH = "oxono_selfplay.pth"
+    MODEL_PATH = "xonox.dqn"
 
     # Model's training by self-play
     trained_network = train_selfplay(
-        num_epochs=500,
-        batch_size=64,
+        num_epochs=50,
+        batch_size=10,
         gamma=0.99,
         epsilon_start=0.5,  # Less exploration, as the model is already trained
         epsilon_end=0.05,
@@ -355,4 +355,4 @@ if __name__ == "__main__":
     )
 
     # Model's evaluation
-    evaluate_against_random(MODEL_PATH, num_games=100)
+    evaluate_against_random(MODEL_PATH, num_games=40)
