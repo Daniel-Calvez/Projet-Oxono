@@ -12,6 +12,7 @@ import model
 from dqn import XonoxNetwork, convert_board, filter_outputs, traduce_output, load_CNN, write_CNN, print_tensor
 from pathlib import Path
 import ia
+from matplotlib import pyplot as plt
 
 class ReplayMemory:
     def __init__(self, capacity=10000):
@@ -28,7 +29,7 @@ class ReplayMemory:
 
 def train_dqn(num_episodes=1000, batch_size=64, gamma=0.99, epsilon_start=1.0, 
              epsilon_end=0.1, epsilon_decay=0.995, learning_rate=0.001, 
-             save_path='oxono_dqn.pth', save_interval=100, eval_interval=50):
+             save_path='oxono_dqn.pth', save_interval=100, eval_interval=50, eval_number = 50):
     """
     Entraîne le réseau DQN pour jouer à Oxono
     
@@ -60,7 +61,7 @@ def train_dqn(num_episodes=1000, batch_size=64, gamma=0.99, epsilon_start=1.0,
     wins = 0
     losses = 0
     draws = 0
-    
+    winrate= []
     for episode in range(num_episodes):
         # Initialisation d'une nouvelle partie
         board = model.init_board()
@@ -223,28 +224,30 @@ def train_dqn(num_episodes=1000, batch_size=64, gamma=0.99, epsilon_start=1.0,
         # Évaluation périodique
         if (episode + 1) % eval_interval == 0:
             win_rate = wins / (wins + losses + draws) if (wins + losses + draws) > 0 else 0
+            winrate.append(evaluate_model("", eval_number, network))
             print(f"Épisode {episode+1}: Victoires: {wins}, Défaites: {losses}, Nuls: {draws}, Taux de victoire: {win_rate:.4f}")
             # Réinitialisation des compteurs pour la prochaine période d'évaluation
             wins, losses, draws = 0, 0, 0
-    
     # Sauvegarde finale du modèle
     write_CNN(network, save_path)
     print(f"Entraînement terminé. Modèle final sauvegardé à {save_path}")
-    return network
+    return network, winrate
 
-def evaluate_model(model_path, num_games=100):
+def evaluate_model(model_path, num_games=100, cnn = ""):
     """
     Évalue les performances du modèle DQN contre un joueur aléatoire
     
-    Args:
+    Args
         model_path: Chemin vers le modèle sauvegardé
         num_games: Nombre de parties à jouer pour l'évaluation
     
     Returns:
         Taux de victoire du modèle
     """
+    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    network = load_CNN(model_path)
+    if(cnn == ""): network = load_CNN(model_path)
+    else: network = cnn
     network.to(device)
     network.eval()
     
@@ -321,16 +324,20 @@ if __name__ == "__main__":
     model_path = "xonox_network.bbl"
     
     # Entraînement du modèle
-    trained_network = train_dqn(
-        num_episodes=400,
+    trained_network, winrate = train_dqn(
+        num_episodes=200,
         batch_size=32,
         gamma=0.99,
-        epsilon_start=0.1000, 
+        epsilon_start=1.0, 
         epsilon_end=0.1,
         epsilon_decay=0.995,
         learning_rate=0.001,
-        save_path=model_path
+        save_path=model_path,
+        eval_interval=10,
+        eval_number=50
     )
-    
+    plt.plot(winrate, label = "taux de victoire contre l'aléatoire")
+    plt.legend()
+    plt.show()
     # Évaluation du modèle
     evaluate_model(model_path, num_games=100)
