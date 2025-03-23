@@ -352,16 +352,16 @@ if __name__ == "__main__":
 
     # Model's training by self-play
     trained_network, winrates = train_selfplay(
-        num_epochs=200,
+        num_epochs=400,
         batch_size=20,
         gamma=0.99,
-        epsilon_start=0.5,  # Less exploration, as the model is already trained
+        epsilon_start=0.65,  # Less exploration, as the model is already trained
         epsilon_end=0.05,
         epsilon_decay=0.995,
-        learning_rate=0.0005,  # Lower rate to improve the model
+        learning_rate=0.0001,  # Lower rate to improve the model
         save_path=MODEL_PATH,
         eval_interval=10,
-        eval_number=30
+        eval_number=50
     )
 
     plt.plot(winrates, label = "Winning rate against random IA")
@@ -370,4 +370,4 @@ if __name__ == "__main__":
     plt.savefig('self_train.jpg')
 
     # Model evaluation
-    evaluate_against_random(MODEL_PATH, 100, None)
+    evaluate_against_random(MODEL_PATH, 200, None)

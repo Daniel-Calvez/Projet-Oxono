@@ -317,14 +317,14 @@ def evaluate_model(model_path: str, num_games: int, cnn: dqn.XonoxNetwork) -> in
     return win_rate
 
 if __name__ == "__main__":
-    MODEL_PATH = "xonox_network2.bbl"
+    MODEL_PATH = "xonox.dqn"
 
     # Model training
     trained_network, winrates = train_dqn(
-        num_epochs=200,
-        batch_size=32,
+        num_epochs=400,
+        batch_size=20,
         gamma=0.99,
-        epsilon_start=1.0, 
+        epsilon_start=1.0,
         epsilon_end=0.1,
         epsilon_decay=0.995,
         learning_rate=0.001,
@@ -336,7 +336,7 @@ if __name__ == "__main__":
     plt.plot(winrates, label = "Winning rate against random IA")
     plt.legend()
     plt.show()
-    plt.savefig('random_train.jpg')
+    plt.savefig('random_train_400.jpg')
 
     # Model evaluation
-    evaluate_model(MODEL_PATH, 100, None)
+    evaluate_model(MODEL_PATH, 200, None)
