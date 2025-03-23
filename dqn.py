@@ -209,20 +209,11 @@ def dqn_play(cnn: list[int], board: list[list[str]], player1: str, player2: str,
     outputs = filter_outputs(cnn(tensor.unsqueeze(0))[0].tolist(), board, active_player)
     return random_select(outputs)
 
+def get_cnn() -> XonoxNetwork:
+    '''
+    Accessor to the CNN network
+    '''
+    return cnn_xonox
+
 # Load or create a CNN model when this module is loaded
 cnn_xonox = load_cnn('xonox.dqn')
-
-
-""" board = [
-    ['P_O', '   ', '   ', '   ', '   ', '   '],
-    ['   ', '   ', '   ', '   ', '   ', '   '],
-    ['   ', 'P_X', '   ', 'P_X', 'T_O', '   '],
-    ['   ', 'P_X', 'T_X', 'P_O', 'J_O', '   '],
-    ['   ', '   ', 'J_O', '   ', '   ', '   '],
-    ['   ', '   ', '   ', '   ', '   ', 'J_X']
-]
-
-now = datetime.datetime.now()
-action = dqn_play(cnn_xonox, board, "Paul", "Jeanne", "Paul")
-
- """

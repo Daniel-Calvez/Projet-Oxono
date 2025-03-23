@@ -7,7 +7,7 @@ Daniel Calvez & Vincent Ducot
 
 import random
 import model
-from dqn import dqn_play
+from dqn import dqn_play, get_cnn
 
 def name() -> str:
     '''
@@ -70,7 +70,7 @@ def try_to_win(board: list[list[str]], totem: str, player: str) -> str:
             # print(f"Test is {drop} is winning")
             if model.is_winner(board, player, drop):
                 action = f"{totem[-1]}{model.reverse_convert_coord(move)}{model.reverse_convert_coord(drop)}"
-                print(f"Go win with {action}")
+                # print(f"Go win with {action}")
                 return action
     return None
 
@@ -110,13 +110,14 @@ def random_play(board: list[list[str]], ia_level: int, player: str) -> str:
     action = f"{totem[-1]}{model.reverse_convert_coord(totem_move)}{model.reverse_convert_coord(pawn_move)}"
     return action
 
-def ask_play(board: list[list[str]], player: str, ia_level: int = 0) -> str:
+def ask_play(board: list[list[str]], player: str, opponent: str, ia_level: int = 2) -> str:
     '''
     Ask the IA its action
     Args
         The board as a matrix
         The player's name
         The opponent's name
+        The IA's level (between 0,1,2)
     Returns
         The action as a string
     Exception
@@ -125,9 +126,10 @@ def ask_play(board: list[list[str]], player: str, ia_level: int = 0) -> str:
     if ia_level in (0,1):
         action = random_play(board, ia_level, player)
     elif ia_level == 2:
-        action = dqn_play(board, player)
+        cnn = get_cnn()
+        action = dqn_play(cnn, board, player, opponent, player)
     else:
         raise ValueError("Unexpected IA level")
 
-    print(f"Action computed {action}")
+    # print(f"Action computed {action}")
     return action
