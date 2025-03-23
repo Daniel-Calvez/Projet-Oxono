@@ -36,7 +36,6 @@ def ia_play(board: list[list[str]], active_player: str, opponent: str, ia_level:
     while not valid_action and ia_counter > 0:
         # One second to answer
         start = time.time()
-        # print(f"Fetch action from IA level {ia_level}")
         action = ia.ask_play(board, active_player, opponent, ia_level)
         end = time.time()
         if end - start > 1:

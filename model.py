@@ -7,13 +7,13 @@ Daniel Calvez & Vincent Ducot
 
 import random as rd
 from copy import deepcopy
-from icecream import ic
+# from icecream import ic
 from colorama import Fore, Style
 
 
 EMPTY_CELL = '   '
 PINK_PLAYER = ""
-ic.configureOutput(includeContext=True)
+# ic.configureOutput(includeContext=True)
 
 class TotemException(Exception):
     '''
@@ -267,16 +267,10 @@ def row_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
     # If no move is possible, maybe jumping is possible
     if len(moves) == 0 and is_landlocked(board, coord):
         # Find next empty cell
-        # @TODO: combine with the previous loop ?
-        #print(f"Testing jump for x = {x}")
-        #print(f"Row range : {list(row_range)}")
         for row in row_range:
-            #print(f"Empty cell in ({x},{row}) ? : {board[x][row]}")
             if board[x][row] == EMPTY_CELL:
-                #print("yes")
                 moves.add((x, row))
                 break
-    #print(f"Found {len(moves)} for direction {direction} : {moves}")
     return moves
 
 def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: str) -> set[tuple[int,int]]:
@@ -313,16 +307,11 @@ def col_totem_moves(board: list[list[str]], coord: tuple[int,int], direction: st
 
     # If no move is possible, maybe jumping is possible
     if len(moves) == 0 and is_landlocked(board, coord):
-        #print(f"Testing jump for y = {y}")
-        #print(f"Row range : {list(col_range)}")
         # Find next empty cell
-        # @TODO: combine with the previous loop ?
         for col in col_range:
-            #print(f"Empty cell in ({col},{y}) ? : {board[col][y]}")
             if board[col][y] == EMPTY_CELL:
                 moves.add((col, y))
                 break
-    #print(f"Found {len(moves)} for direction {direction} : {moves}")
     return moves
 
 def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
@@ -351,7 +340,6 @@ def all_totem_moves(board: list[list[str]], totem: str) -> set[tuple[int,int]]:
     all_moves.update(col_totem_moves(board, (totem_x, totem_y), 'up'))
     all_moves.update(col_totem_moves(board, (totem_x, totem_y), 'down'))
 
-    #print(f"There are {len(all_moves)} moves possibles : {all_moves}")
     return all_moves
 
 def move_totem(board: list[list[str]], totem: str, coord: tuple[int, int]) -> None:
@@ -493,7 +481,6 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
 
     totem_moves = all_totem_moves(board, totem)
     totem_coord = convert_coord(action[1:3])
-    #print(totem_moves)
     if totem_coord not in totem_moves:
         #print("Totem move impossible")
         return False
@@ -503,10 +490,8 @@ def is_valid_action(board: list[list[str]], action: str, player: str ) -> bool :
     move_totem(board_copy, totem, totem_coord)
 
     token_drops = all_token_drops(board_copy, totem_coord)
-    #ic(token_drops)
     token_coord = convert_coord(action[3:5])
 
-    #ic(token_drops)
     if token_coord not in token_drops:
         #print("Token move impossible")
         return False
@@ -531,7 +516,6 @@ def ask_play(board: list[list[str]], player: str, opponent: str) -> str:
     while not valid_action:
         action = input(f"Vous êtes {player}, quelle action souhaitez-vous faire ? ")
         valid_action = is_valid_action(board, action, player)
-        #print(f"Is {action} a valid action ? {valid_action}")
 
     return action
 

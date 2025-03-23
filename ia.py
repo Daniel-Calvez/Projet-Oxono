@@ -41,7 +41,6 @@ def all_pawn_moves(board: list[list[str]], totem_move: tuple[int,int], totem: st
     # Then add special cases
     if model.is_landlocked(board, totem_move):
         pawn_moves = model.all_free_cells(board)
-        #ic(token_drops)
         pawn_moves.discard(totem_move)
         pawn_moves.add(curr_coord_totem)
 
@@ -67,10 +66,8 @@ def try_to_win(board: list[list[str]], totem: str, player: str) -> str:
     for move in all_totem_moves:
         pawn_moves = all_pawn_moves(board, move, totem)
         for drop in pawn_moves:
-            # print(f"Test is {drop} is winning")
             if model.is_winner(board, player, drop):
                 action = f"{totem[-1]}{model.reverse_convert_coord(move)}{model.reverse_convert_coord(drop)}"
-                # print(f"Go win with {action}")
                 return action
     return None
 
