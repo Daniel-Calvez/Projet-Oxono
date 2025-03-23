@@ -13,13 +13,16 @@ https://www.python.org/downloads/
 Il est nécessaire d'installer pytest et argparse
 
 <code>pip install pytest<br>
+pip install icecream<br>
 pip install argparse</code>
 
 ### Pour l'IA basée sur le Deep-Q-Learning
 
 Il est necessaire d'installer pytorch en plus
 
-`pip install pytorch`
+<code>pip install pytorch<br>
+pip install matplotlib<br>
+pip install pathlib</code>
 
 ## Utilisation
 usage: python game.py [-h] [--player1-ia] [--player2-ia] [--ia1-level {0,1,2}] [--ia2-level {0,1,2}] player1 player2
